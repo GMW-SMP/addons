@@ -1,0 +1,7 @@
+name: Megachonker
+version: ${project.version}
+main: cc.flogi.dev.megachonker.Megachonker
+api-version: 1.13
+prefix: Chonker
+authors: [flogic]
+description: Core operations of megachonker.
