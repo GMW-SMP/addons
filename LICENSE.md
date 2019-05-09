@@ -1,2 +1,2 @@
 
-Copyright (C) 2019 flogic
+Copyright (C) 2019 Caden "flogic" Kriese
