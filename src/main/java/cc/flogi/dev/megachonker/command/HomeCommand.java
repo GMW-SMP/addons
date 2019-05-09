@@ -1,6 +1,6 @@
 package cc.flogi.dev.megachonker.command;
 
-import cc.flogi.dev.megachonker.util.UtilCountdown;
+import cc.flogi.dev.megachonker.util.Cooldown;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +17,8 @@ public class HomeCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             if (player.getBedSpawnLocation() != null)
-                new UtilCountdown(player, 100, () -> player.teleport(player.getBedLocation()), "Teleporting home in", true);
+                new Cooldown(player, 100, () -> player.teleport(player.getBedSpawnLocation()),
+                        "Teleporting home in", "&aTeleportation complete.", true).start();
         }
 
         return false;

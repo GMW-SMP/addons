@@ -16,7 +16,7 @@ public class UtilUI {
     /**
      * Sends an action bar message to the player.
      *
-     * @param player The player to receive the message.
+     * @param player  The player to receive the message.
      * @param message The message to be sent (with color codes to be replaced).
      */
     public static void sendActionBar(Player player, String message) {
@@ -27,7 +27,7 @@ public class UtilUI {
     /**
      * Sends an action bar message to the player.
      *
-     * @param player The player to receive the message.
+     * @param player  The player to receive the message.
      * @param message The message to be sent (with color codes to be replaced).
      */
     public static void sendActionBarSynchronous(Player player, String message) {

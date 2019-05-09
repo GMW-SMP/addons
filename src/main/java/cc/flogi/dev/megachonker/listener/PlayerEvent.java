@@ -3,11 +3,8 @@ package cc.flogi.dev.megachonker.listener;
 import cc.flogi.dev.megachonker.Megachonker;
 import cc.flogi.dev.megachonker.player.GamePlayer;
 import cc.flogi.dev.megachonker.player.GamePlayerManager;
-import cc.flogi.dev.megachonker.util.UtilCountdown;
 import cc.flogi.dev.megachonker.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -20,9 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Caden Kriese (flogic)
@@ -40,7 +35,7 @@ public class PlayerEvent implements Listener {
         if (bonn != null) {
             if (player.getNearbyEntities(10, 10, 10).contains(bonn)) {
                 event.setCancelled(true);
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("You cannot sleep right now; Bonn Lafehr is nearby."));
+                UtilUI.sendActionBar(player, "You cannot sleep right now; Bonn Lafehr is nearby.");
             }
         }
     }
@@ -55,14 +50,14 @@ public class PlayerEvent implements Listener {
                 @Override public void run() {
                     recentlyBadPlayers.add(player);
                     player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1, 1);
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_RED+"BAD CHILD"));
+                    player.sendTitle(ChatColor.DARK_RED + ChatColor.BOLD.toString() + "BAD CHILD", "", 5, 70, 20);
 
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
                             @Override public void run() {
                                 player.getWorld().strikeLightning(player.getLocation());
                             }
-                        }.runTaskLater(Megachonker.getInstance(), i*5);
+                        }.runTaskLater(Megachonker.getInstance(), i * 3);
                     }
 
                     new BukkitRunnable() {
@@ -73,11 +68,7 @@ public class PlayerEvent implements Listener {
                 }
             }.runTask(Megachonker.getInstance());
         } else if (event.getMessage().toLowerCase().contains("nibba")) {
-            new BukkitRunnable() {
-                @Override public void run() {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+"Good Child"));
-                }
-            }.runTask(Megachonker.getInstance());
+            UtilUI.sendActionBarSynchronous(player, "&aGood child.");
         }
     }
 
@@ -85,30 +76,17 @@ public class PlayerEvent implements Listener {
     public void onDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer((Player) event.getEntity());
-            List<UtilCountdown> cooldownsFiltered = gamePlayer.getActiveCountdowns()
-                                                    .stream()
-                                                    .filter(UtilCountdown::isInterruptable)
-                                                    .collect(Collectors.toList());
-
-            gamePlayer.getActiveCountdowns().removeAll(cooldownsFiltered);
-
-            if (cooldownsFiltered.size() > 1)
-                UtilUI.sendActionBar(gamePlayer.getPlayer(), "&4&lCANCELLED &8- &7Damage taken.");
+            gamePlayer.interruptCooldowns("Damage taken.");
         }
     }
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
-        List<UtilCountdown> cooldownsFiltered = gamePlayer.getActiveCountdowns()
-                                                        .stream()
-                                                        .filter(UtilCountdown::isInterruptable)
-                                                        .collect(Collectors.toList());
-
-        gamePlayer.getActiveCountdowns().removeAll(cooldownsFiltered);
-
-        if (cooldownsFiltered.size() > 1)
-            UtilUI.sendActionBar(gamePlayer.getPlayer(), "&4&lCANCELLED &8- &7Movement detected.");
+        //Ensure they didnt just move their mouse.
+        if (event.getTo() != null && event.getFrom().distance(event.getTo()) > 0) {
+            GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+            gamePlayer.interruptCooldowns("Movement detected.");
+        }
     }
 
     @EventHandler
@@ -122,20 +100,22 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         GamePlayerManager.getInstance().addPlayers(event.getPlayer());
+        event.setJoinMessage("");
 
-        if (event.getPlayer().getName().equals("fl0gic") || event.getPlayer().getName().equals("Memorys_"))
-            event.setJoinMessage(ChatColor.translateAlternateColorCodes('&', "&8[&a+&8] &c"+event.getPlayer().getName()));
+        if (event.getPlayer().isOp())
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&a+&8] &c" + event.getPlayer().getName()));
         else
-            event.setJoinMessage(ChatColor.translateAlternateColorCodes('&', "&8[&a+&8] &3"+event.getPlayer().getName()));
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&a+&8] &3" + event.getPlayer().getName()));
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         GamePlayerManager.getInstance().playerLogout(event.getPlayer());
+        event.setQuitMessage("");
 
-        if (event.getPlayer().getName().equals("fl0gic") || event.getPlayer().getName().equals("Memorys_"))
-            event.setQuitMessage(ChatColor.translateAlternateColorCodes('&', "&8[&c-&8] &c"+event.getPlayer().getName()));
+        if (event.getPlayer().isOp())
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&c-&8] &c" + event.getPlayer().getName()));
         else
-            event.setQuitMessage(ChatColor.translateAlternateColorCodes('&', "&8[&c-&8] &3"+event.getPlayer().getName()));
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&c-&8] &3" + event.getPlayer().getName()));
     }
 }

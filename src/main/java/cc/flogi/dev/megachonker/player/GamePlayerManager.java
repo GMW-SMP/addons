@@ -16,9 +16,10 @@ import java.util.stream.Collectors;
  */
 public class GamePlayerManager {
     @Getter private static GamePlayerManager instance = new GamePlayerManager();
-    private GamePlayerManager() {}
-
     private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
+
+    private GamePlayerManager() {
+    }
 
     /**
      * Returns the ${@link GamePlayer} of the specified player.
