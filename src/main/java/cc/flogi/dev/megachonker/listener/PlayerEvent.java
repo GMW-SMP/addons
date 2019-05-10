@@ -44,6 +44,9 @@ public class PlayerEvent implements Listener {
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
 
+        String color = player.isOp() ? "&c" : "&3";
+        event.setFormat(ChatColor.translateAlternateColorCodes('&', color + player.getName() + " &8: &f" + event.getMessage()));
+
         //if at least one doesnt match.
         if (!Arrays.stream(badWords).allMatch(word -> event.getMessage().toLowerCase().contains(word))) {
             new BukkitRunnable() {
