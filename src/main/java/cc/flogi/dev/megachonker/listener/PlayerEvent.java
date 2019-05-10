@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 public class PlayerEvent implements Listener {
     private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
-    private String[] badWords = new String[]{"nigga", "nigger", "retard", "chink", "faggot"};
+    private final String[] badWords = new String[]{"nigga", "nigger", "chink", "beaner"};
 
     @EventHandler
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -47,8 +47,7 @@ public class PlayerEvent implements Listener {
         String color = player.isOp() ? "&c" : "&3";
         event.setFormat(ChatColor.translateAlternateColorCodes('&', color + player.getName() + " &8: &f" + event.getMessage()));
 
-        //if at least one doesnt match.
-        if (!Arrays.stream(badWords).allMatch(word -> event.getMessage().toLowerCase().contains(word))) {
+        if (Arrays.stream(badWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
             new BukkitRunnable() {
                 @Override public void run() {
                     recentlyBadPlayers.add(player);
