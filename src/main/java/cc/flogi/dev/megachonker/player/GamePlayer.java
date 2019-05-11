@@ -1,8 +1,11 @@
 package cc.flogi.dev.megachonker.player;
 
+import cc.flogi.dev.megachonker.Megachonker;
 import cc.flogi.dev.megachonker.util.Cooldown;
 import cc.flogi.dev.megachonker.util.UtilUI;
 import lombok.Data;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -18,10 +21,17 @@ import java.util.stream.Collectors;
     private Player player;
     private ArrayList<Cooldown> activeCountdowns;
     private boolean recentlyBad;
+    private ChatColor nameColor;
 
     public GamePlayer(Player player) {
+        FileConfiguration config = Megachonker.getInstance().getConfig();
+
         this.player = player;
         activeCountdowns = new ArrayList<>();
+
+        String color = config.getString("players."+player.getUniqueId().toString()+".name-color");
+        if (color != null)
+            nameColor = ChatColor.valueOf(color.toUpperCase());
     }
 
     public void interruptCooldowns(String message) {

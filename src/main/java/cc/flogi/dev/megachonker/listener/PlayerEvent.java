@@ -43,16 +43,17 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(player);
 
-        String color = player.isOp() ? "&c" : "&3";
-        event.setFormat(ChatColor.translateAlternateColorCodes('&', color + player.getName() + " &8: &f" + event.getMessage()));
+        String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
+        event.setFormat(UtilUI.colorize(color + player.getName() + " &8: &f" + event.getMessage()));
 
         if (Arrays.stream(badWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
             new BukkitRunnable() {
                 @Override public void run() {
                     recentlyBadPlayers.add(player);
                     player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1, 1);
-                    player.sendTitle(ChatColor.DARK_RED + ChatColor.BOLD.toString() + "BAD CHILD", "", 5, 70, 20);
+                    UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "BAD CHILD", "", 5, 70, 20);
 
                     for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
@@ -84,10 +85,12 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        //Ensure they didnt just move their mouse.
-        if (event.getTo() != null && event.getFrom().distance(event.getTo()) > 0) {
-            GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
-            gamePlayer.interruptCooldowns("Movement detected.");
+        if (GamePlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
+            //Ensure they didnt just move their mouse.
+            if (event.getTo() != null && event.getFrom().distance(event.getTo()) > 0) {
+                GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+                gamePlayer.interruptCooldowns("Movement detected.");
+            }
         }
     }
 
@@ -102,22 +105,22 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         GamePlayerManager.getInstance().addPlayers(event.getPlayer());
+        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+
         event.setJoinMessage("");
 
-        if (event.getPlayer().isOp())
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&a+&8] &c" + event.getPlayer().getName()));
-        else
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&a+&8] &3" + event.getPlayer().getName()));
+        String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
+        Bukkit.broadcastMessage(UtilUI.colorize("&8[&a+&8] " + color + event.getPlayer().getName()));
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         GamePlayerManager.getInstance().playerLogout(event.getPlayer());
+        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+
         event.setQuitMessage("");
 
-        if (event.getPlayer().isOp())
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&c-&8] &c" + event.getPlayer().getName()));
-        else
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&8[&c-&8] &3" + event.getPlayer().getName()));
+        String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
+        Bukkit.broadcastMessage(UtilUI.colorize("&8[&c-&8] &3" + color + event.getPlayer().getName()));
     }
 }

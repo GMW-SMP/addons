@@ -21,7 +21,7 @@ public class UtilUI {
      */
     public static void sendActionBar(Player player, String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
+                new TextComponent(colorize(message)));
     }
 
     /**
@@ -33,9 +33,45 @@ public class UtilUI {
     public static void sendActionBarSynchronous(Player player, String message) {
         new BukkitRunnable() {
             @Override public void run() {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(colorize(message)));
             }
         }.runTask(Megachonker.getInstance());
+    }
+
+    /**
+     * Sends a player a title.
+     *
+     * @param player The player to receive the title.
+     * @param title The text to be displayed. (Color codes supported)
+     * @param fadeIn The fade in duration in ticks.
+     * @param stay The stay duration in ticks.
+     * @param fadeOut The fade out duration in ticks.
+     */
+    public static void sendTitle(Player player, String title, int fadeIn, int stay, int fadeOut) {
+        sendTitle(player, title, "", 20, 40, 20);
+    }
+
+    /**
+     * Sends a player a title & subtitle.
+     *
+     * @param player The player to receive the title.
+     * @param title The text to be displayed. (Color codes supported)
+     * @param subtitle The subtitle text to be displayed. (Color codes supported)
+     * @param fadeIn The fade in duration in ticks.
+     * @param stay The stay duration in ticks.
+     * @param fadeOut The fade out duration in ticks.
+     */
+    public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        player.sendTitle(colorize(title), colorize(subtitle), fadeIn, stay, fadeOut);
+    }
+
+    /**
+     * Shorthand notation for ${@link ChatColor#translateAlternateColorCodes(char, String)}.
+     *
+     * @param string The string to be colorized.
+     * @return The colorized string.
+     */
+    public static String colorize(String string) {
+        return ChatColor.translateAlternateColorCodes('&', string);
     }
 }

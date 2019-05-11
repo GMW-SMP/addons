@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class GamePlayerManager {
     @Getter private static GamePlayerManager instance = new GamePlayerManager();
-    private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
+    @Getter private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
 
     private GamePlayerManager() {
     }

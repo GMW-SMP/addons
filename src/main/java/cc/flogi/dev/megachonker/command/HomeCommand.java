@@ -21,6 +21,6 @@ public class HomeCommand implements CommandExecutor {
                         "Teleporting home in", "&aTeleportation complete.", true).start();
         }
 
-        return false;
+        return true;
     }
 }
