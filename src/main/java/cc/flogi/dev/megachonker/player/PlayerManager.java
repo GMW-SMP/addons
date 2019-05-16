@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
  *
  * Created on 2019-05-08
  */
-public class GamePlayerManager {
-    @Getter private static GamePlayerManager instance = new GamePlayerManager();
+public class PlayerManager {
+    @Getter private static PlayerManager instance = new PlayerManager();
     @Getter private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
 
-    private GamePlayerManager() {
+    private PlayerManager() {
     }
 
     /**

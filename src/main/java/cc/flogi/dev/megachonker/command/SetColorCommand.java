@@ -2,7 +2,7 @@ package cc.flogi.dev.megachonker.command;
 
 import cc.flogi.dev.megachonker.Megachonker;
 import cc.flogi.dev.megachonker.player.GamePlayer;
-import cc.flogi.dev.megachonker.player.GamePlayerManager;
+import cc.flogi.dev.megachonker.player.PlayerManager;
 import cc.flogi.dev.megachonker.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.EnumUtils;
@@ -23,7 +23,7 @@ public class SetColorCommand implements CommandExecutor {
         if (sender instanceof Player) {
             PlayerInteractEvent event;
             Player player = (Player) sender;
-            GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(player);
+            GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
 
             if (args.length > 0) {
                 if (EnumUtils.isValidEnum(ChatColor.class, args[0].toUpperCase())) {

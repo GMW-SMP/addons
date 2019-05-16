@@ -2,11 +2,10 @@ package cc.flogi.dev.megachonker.listener;
 
 import cc.flogi.dev.megachonker.Megachonker;
 import cc.flogi.dev.megachonker.player.GamePlayer;
-import cc.flogi.dev.megachonker.player.GamePlayerManager;
+import cc.flogi.dev.megachonker.player.PlayerManager;
 import cc.flogi.dev.megachonker.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,7 +25,7 @@ import java.util.UUID;
  */
 public class PlayerEvent implements Listener {
     private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
-    private final String[] badWords = new String[]{"nigga", "nigger", "chink", "beaner"};
+    private final String[] badWords = new String[]{"nigga", "nigger", "chink"};
 
     @EventHandler
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -43,7 +42,7 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(player);
+        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
 
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         event.setFormat(UtilUI.colorize(color + player.getName() + " &8: &f" + event.getMessage()));
@@ -52,7 +51,6 @@ public class PlayerEvent implements Listener {
             new BukkitRunnable() {
                 @Override public void run() {
                     recentlyBadPlayers.add(player);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1, 1);
                     UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "BAD CHILD", "", 5, 70, 20);
 
                     for (int i = 0; i < 6; i++) {
@@ -70,25 +68,23 @@ public class PlayerEvent implements Listener {
                     }.runTaskLater(Megachonker.getInstance(), 20 * 10L);
                 }
             }.runTask(Megachonker.getInstance());
-        } else if (event.getMessage().toLowerCase().contains("nibba")) {
-            UtilUI.sendActionBarSynchronous(player, "&aGood child.");
         }
     }
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
-            GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer((Player) event.getEntity());
+            GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer((Player) event.getEntity());
             gamePlayer.interruptCooldowns("Damage taken.");
         }
     }
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (GamePlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
+        if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
             //Ensure they didnt just move their mouse.
-            if (event.getTo() != null && event.getFrom().distance(event.getTo()) > 0) {
-                GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+            if (event.getFrom().distance(event.getTo()) > 0) {
+                GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
                 gamePlayer.interruptCooldowns("Movement detected.");
             }
         }
@@ -97,15 +93,15 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         if (recentlyBadPlayers.contains(event.getEntity())) {
-            event.setDeathMessage(ChatColor.RED + event.getEntity().getName() + " was a discriminatory cunt.");
+            event.setDeathMessage(event.getEntity().getName() + " died of racism.");
             recentlyBadPlayers.remove(event.getEntity());
         }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        GamePlayerManager.getInstance().addPlayers(event.getPlayer());
-        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        PlayerManager.getInstance().addPlayers(event.getPlayer());
+        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
 
         event.setJoinMessage("");
 
@@ -115,8 +111,8 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        GamePlayerManager.getInstance().playerLogout(event.getPlayer());
-        GamePlayer gamePlayer = GamePlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        PlayerManager.getInstance().playerLogout(event.getPlayer());
+        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
 
         event.setQuitMessage("");
 

@@ -11,14 +11,14 @@ import org.bukkit.entity.Player;
  *
  * Created on 2019-05-08
  */
-public class HomeCommand implements CommandExecutor {
+@SuppressWarnings("NullableProblems") public class HomeCommand implements CommandExecutor {
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
             if (player.getBedSpawnLocation() != null)
-                new Cooldown(player, 100, () -> player.teleport(player.getBedSpawnLocation()),
-                        "Teleporting home in", "&aTeleportation complete.", true).start();
+                new Cooldown(player, 1, 100, () -> player.teleport(player.getBedSpawnLocation()),
+                        "&6Teleporting home in &e%s &6%s.", "&aTeleportation complete.", true).start();
         }
 
         return true;

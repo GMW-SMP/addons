@@ -11,7 +11,7 @@
 
     <name>Megachonker</name>
 
-    <description>Core operations of megachonker server.</description>
+    <description>Core operations of Megachonker server.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

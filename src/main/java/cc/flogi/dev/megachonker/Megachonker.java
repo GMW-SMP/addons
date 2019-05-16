@@ -3,7 +3,7 @@ package cc.flogi.dev.megachonker;
 import cc.flogi.dev.megachonker.command.HomeCommand;
 import cc.flogi.dev.megachonker.command.SetColorCommand;
 import cc.flogi.dev.megachonker.listener.PlayerEvent;
-import cc.flogi.dev.megachonker.player.GamePlayerManager;
+import cc.flogi.dev.megachonker.player.PlayerManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Megachonker extends JavaPlugin {
     @Getter private static Megachonker instance;
 
-    @Override public void onEnable() {
+    @SuppressWarnings("ConstantConditions") @Override public void onEnable() {
         instance = this;
         getConfig().options().copyDefaults(true);
         saveConfig();
@@ -24,7 +24,8 @@ public final class Megachonker extends JavaPlugin {
         getCommand("home").setExecutor(new HomeCommand());
         getCommand("setcolor").setExecutor(new SetColorCommand());
 
-        GamePlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
+        //Classes
+        PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
     }
 
     @Override public void onDisable() {}
