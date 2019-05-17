@@ -2,6 +2,7 @@ package cc.flogi.dev.megachonker;
 
 import cc.flogi.dev.megachonker.command.HomeCommand;
 import cc.flogi.dev.megachonker.command.SetColorCommand;
+import cc.flogi.dev.megachonker.listener.BlockEvent;
 import cc.flogi.dev.megachonker.listener.PlayerEvent;
 import cc.flogi.dev.megachonker.player.PlayerManager;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public final class Megachonker extends JavaPlugin {
 
         //Events
         Bukkit.getPluginManager().registerEvents(new PlayerEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
         getCommand("home").setExecutor(new HomeCommand());
