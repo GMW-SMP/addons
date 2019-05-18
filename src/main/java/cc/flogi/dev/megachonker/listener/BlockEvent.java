@@ -38,7 +38,8 @@ public class BlockEvent implements Listener {
             String colorizedText = UtilUI.colorize(event.getInventory().getRenameText());
             Player player = (Player) event.getViewers().get(0);
 
-            if (colorizedText.contains("\u00A7")) {
+            //TODO fix this npe
+            if (colorizedText.contains("\u00A7") && event.getResult().hasItemMeta()) {
                 ItemMeta meta = event.getResult().getItemMeta();
                 meta.setDisplayName(colorizedText);
                 event.getResult().setItemMeta(meta);
