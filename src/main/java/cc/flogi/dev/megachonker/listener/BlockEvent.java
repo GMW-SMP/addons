@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 
@@ -26,7 +28,24 @@ public class BlockEvent implements Listener {
         Player player = event.getPlayer();
         if (Arrays.stream(event.getLines()).anyMatch(line -> line.contains("\u00A7"))) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-            player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Updated sign colors."));
+            player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Colorized sign text."));
+        }
+    }
+
+    @EventHandler
+    public void onAnvilEvent(PrepareAnvilEvent event) {
+        if (event.getResult() != null) {
+            String colorizedText = UtilUI.colorize(event.getInventory().getRenameText());
+            Player player = (Player) event.getViewers().get(0);
+
+            if (colorizedText.contains("\u00A7")) {
+                ItemMeta meta = event.getResult().getItemMeta();
+                meta.setDisplayName(colorizedText);
+                event.getResult().setItemMeta(meta);
+
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Colorized item name."));
+            }
         }
     }
 }
