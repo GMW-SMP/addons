@@ -10,3 +10,6 @@ commands:
     description: Teleports you to your bed location.
   setcolor:
     description: Sets the color of your name in chat.
+  titlebroadcast:
+    aliases: tbc
+    description: Sends a title to all the online players, seperate subtitle with <nl>.
