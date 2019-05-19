@@ -6,12 +6,15 @@ import cc.flogi.dev.megachonker.player.PlayerManager;
 import cc.flogi.dev.megachonker.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -68,6 +71,22 @@ public class PlayerEvent implements Listener {
                     }.runTaskLater(Megachonker.getInstance(), 20 * 10L);
                 }
             }.runTask(Megachonker.getInstance());
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+
+            if (event.getClickedInventory() instanceof AnvilInventory) {
+                if (event.getSlot() == 2 && event.getCurrentItem() != null && event.getCurrentItem().getItemMeta().hasDisplayName()) {
+                    if (event.getCurrentItem().getItemMeta().getDisplayName().contains("\u00A7")) {
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                        player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Colorized item name."));
+                    }
+                }
+            }
         }
     }
 
