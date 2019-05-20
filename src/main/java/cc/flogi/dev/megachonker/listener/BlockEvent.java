@@ -34,7 +34,7 @@ public class BlockEvent implements Listener {
 
     @EventHandler
     public void onAnvilEvent(PrepareAnvilEvent event) {
-        if (event.getResult() != null) {
+        if (event.getResult() != null && event.getInventory().getRenameText() != null) {
             String colorizedText = UtilUI.colorize(event.getInventory().getRenameText());
             Player player = (Player) event.getViewers().get(0);
 
