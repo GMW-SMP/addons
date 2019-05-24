@@ -36,7 +36,6 @@ public class BlockEvent implements Listener {
     public void onAnvilEvent(PrepareAnvilEvent event) {
         if (event.getResult() != null && event.getInventory().getRenameText() != null) {
             String colorizedText = UtilUI.colorize(event.getInventory().getRenameText());
-            Player player = (Player) event.getViewers().get(0);
 
             if (colorizedText.contains("\u00A7") && event.getResult().hasItemMeta()) {
                 ItemMeta meta = event.getResult().getItemMeta();

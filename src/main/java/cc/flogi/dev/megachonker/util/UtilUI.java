@@ -1,9 +1,7 @@
 package cc.flogi.dev.megachonker.util;
 
-import cc.flogi.dev.megachonker.Megachonker;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * @author Caden Kriese (flogic)
@@ -19,20 +17,6 @@ public class UtilUI {
      */
     public static void sendActionBar(Player player, String message) {
         player.sendActionBar('&', message);
-    }
-
-    /**
-     * Sends an action bar message to the player.
-     *
-     * @param player  The player to receive the message.
-     * @param message The message to be sent (with color codes to be replaced).
-     */
-    public static void sendActionBarSynchronous(Player player, String message) {
-        new BukkitRunnable() {
-            @Override public void run() {
-                player.sendActionBar('&', message);
-            }
-        }.runTask(Megachonker.getInstance());
     }
 
     /**
