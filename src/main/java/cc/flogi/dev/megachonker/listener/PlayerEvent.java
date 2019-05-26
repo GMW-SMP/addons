@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -30,15 +31,33 @@ public class PlayerEvent implements Listener {
     private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
     private final String[] badWords = new String[]{"nigga", "nigger", "chink"};
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
         Player player = event.getPlayer();
+        GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
+
         Player bonn = Bukkit.getPlayer(UUID.fromString("f92a66c0-65bd-4490-bb41-6a87e3ed408e"));
         if (bonn != null) {
             if (player.getNearbyEntities(10, 10, 10).contains(bonn)) {
                 event.setCancelled(true);
                 UtilUI.sendActionBar(player, "You cannot sleep right now; Bonn Lafehr is nearby.");
             }
+        }
+
+        if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
+            if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Bed spawn location set. Use /home to teleport to this location."));
+                UtilUI.sendActionBar(player, "Bed spawn location set.");
+            }
+
+            Bukkit.broadcastMessage(gp.getNameColor()+player.getName()+ChatColor.GRAY+" has entered a bed.");
+
+            ArrayList<Player> otherPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+            otherPlayers.remove(player);
+
+            if (otherPlayers.size() == 0 || otherPlayers.stream().allMatch(Player::isSleeping))
+                Bukkit.broadcastMessage(ChatColor.GRAY+"All players are sleeping, cycling to daylight.");
         }
     }
 
