@@ -51,7 +51,9 @@ public class PlayerEvent implements Listener {
                 UtilUI.sendActionBar(player, "Bed spawn location set.");
             }
 
-            Bukkit.broadcastMessage(gp.getNameColor()+player.getName()+ChatColor.GRAY+" has entered a bed.");
+            ChatColor nameColor = gp.getNameColor() == null ? ChatColor.GRAY : gp.getNameColor();
+
+            Bukkit.broadcastMessage(nameColor+player.getName()+ChatColor.GRAY+" has entered a bed.");
 
             ArrayList<Player> otherPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
             otherPlayers.remove(player);
