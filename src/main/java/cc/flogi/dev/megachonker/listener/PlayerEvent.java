@@ -61,7 +61,7 @@ public class PlayerEvent implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
@@ -90,6 +90,19 @@ public class PlayerEvent implements Listener {
                     }.runTaskLater(Megachonker.getInstance(), 20 * 10L);
                 }
             }.runTask(Megachonker.getInstance());
+        }
+
+        if (!event.isCancelled()) {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {
+                    onlinePlayer.sendMessage(event.getFormat().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.RESET));
+                    onlinePlayer.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+                } else {
+                    onlinePlayer.sendMessage(event.getFormat());
+                }
+            }
+
+            event.setCancelled(true);
         }
     }
 
