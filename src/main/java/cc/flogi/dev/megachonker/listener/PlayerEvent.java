@@ -20,7 +20,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 
 /**
  * @author Caden Kriese (flogic)
@@ -29,20 +28,12 @@ import java.util.UUID;
  */
 public class PlayerEvent implements Listener {
     private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
-    private final String[] badWords = new String[]{"nigga", "nigger", "chink"};
+    private final String[] blacklistedWords = new String[]{"nigga", "nigger", "chink"};
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
         Player player = event.getPlayer();
         GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
-
-        Player bonn = Bukkit.getPlayer(UUID.fromString("f92a66c0-65bd-4490-bb41-6a87e3ed408e"));
-        if (bonn != null) {
-            if (player.getNearbyEntities(10, 10, 10).contains(bonn)) {
-                event.setCancelled(true);
-                UtilUI.sendActionBar(player, "You cannot sleep right now; Bonn Lafehr is nearby.");
-            }
-        }
 
         if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
             if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
@@ -71,7 +62,7 @@ public class PlayerEvent implements Listener {
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         event.setFormat(UtilUI.colorize(color + player.getName() + " &8: &f" + event.getMessage()));
 
-        if (Arrays.stream(badWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
+        if (Arrays.stream(blacklistedWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
             new BukkitRunnable() {
                 @Override public void run() {
                     recentlyBadPlayers.add(player);

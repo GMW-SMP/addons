@@ -21,13 +21,13 @@ import org.bukkit.command.CommandSender;
             int fadeOut = 10;
             boolean writeToSubtitle = false;
             for (String string : args) {
-                if (string.startsWith("fadein:"))
+                if (string.startsWith("fadein:")) {
                     fadeIn = Integer.parseInt(string.substring("fadein:".length()));
-                else if (string.startsWith("stay:"))
+                } else if (string.startsWith("stay:")) {
                     stay = Integer.parseInt(string.substring("stay:".length()));
-                else if (string.startsWith("fadeout:"))
+                } else if (string.startsWith("fadeout:")) {
                     fadeOut = Integer.parseInt(string.substring("fadeout:".length()));
-                else {
+                } else {
                     string = string.replaceFirst("[%{][Nn][Ll][%}]", "<nl>");
                     String[] split = string.split("(?i)<nl>");
 
@@ -39,22 +39,29 @@ import org.bukkit.command.CommandSender;
                         continue;
                     }
 
-                    if (!writeToSubtitle)
+                    if (!writeToSubtitle) {
                         title.append(title.toString().equals("") ? string : " " + string);
-                    else
+                    } else {
                         subTitle.append(" ").append(string);
+                    }
                 }
             }
 
-            final String colorizedTitle = UtilUI.colorize(title.toString());
-            final String sTitle = UtilUI.colorize(subTitle.toString());
-            final int fIn = fadeIn;
-            final int fOut = fadeOut;
-            final int st = stay;
+            String finalTitle = UtilUI.colorize(title.toString());
+            String finalSubtitle = UtilUI.colorize(subTitle.toString());
+            int finalFadeIn = fadeIn;
+            int finalFadeOut = fadeOut;
+            int finalStay = stay;
 
-            Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(colorizedTitle, sTitle, fIn, st, fOut));
-        } else
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(
+                                                              finalTitle,
+                                                              finalSubtitle,
+                                                              finalFadeIn,
+                                                              finalStay,
+                                                              finalFadeOut));
+        } else {
             sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7Insufficient permissions."));
+        }
 
         return true;
     }

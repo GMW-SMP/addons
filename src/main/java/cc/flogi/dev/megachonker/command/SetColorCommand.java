@@ -11,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
  * @author Caden Kriese (flogic)
@@ -21,7 +20,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class SetColorCommand implements CommandExecutor {
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
-            PlayerInteractEvent event;
             Player player = (Player) sender;
             GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
 

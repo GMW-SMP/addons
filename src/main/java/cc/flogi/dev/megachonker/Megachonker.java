@@ -11,10 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class Megachonker extends JavaPlugin {
+@SuppressWarnings("ConstantConditions") public final class Megachonker extends JavaPlugin {
     @Getter private static Megachonker instance;
 
-    @SuppressWarnings("ConstantConditions") @Override public void onEnable() {
+    @Override public void onEnable() {
         instance = this;
         getConfig().options().copyDefaults(true);
         saveConfig();
