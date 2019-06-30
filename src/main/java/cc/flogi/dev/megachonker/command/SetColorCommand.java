@@ -11,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Caden Kriese (flogic)
@@ -18,7 +19,7 @@ import org.bukkit.entity.Player;
  * Created on 2019-05-11
  */
 public class SetColorCommand implements CommandExecutor {
-    @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
@@ -29,9 +30,9 @@ public class SetColorCommand implements CommandExecutor {
                     gamePlayer.setNameColor(color);
 
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                    sender.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Name color set to '"+color+color.name()+"&7'"));
+                    sender.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Name color set to '" + color + color.name() + "&7'"));
 
-                    Megachonker.getInstance().getConfig().set("players."+player.getUniqueId().toString()+".name-color", color.getName());
+                    Megachonker.getInstance().getConfig().set("players." + player.getUniqueId().toString() + ".name-color", color.getName());
                     Megachonker.getInstance().saveConfig();
 
                     return true;
@@ -41,7 +42,7 @@ public class SetColorCommand implements CommandExecutor {
             sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7Invalid color, here's a list of colors to choose from:"));
             for (ChatColor value : ChatColor.values()) {
                 if (!value.name().equals("MAGIC"))
-                    sender.sendMessage(value+"- "+value.getName());
+                    sender.sendMessage(value + "- " + value.getName());
             }
         }
 

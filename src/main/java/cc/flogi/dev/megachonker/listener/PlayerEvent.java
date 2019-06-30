@@ -6,6 +6,7 @@ import cc.flogi.dev.megachonker.player.PlayerManager;
 import cc.flogi.dev.megachonker.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -126,8 +127,9 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
-            //Ensure they didnt just move their mouse.
-            if (event.getFrom().distance(event.getTo()) > 0) {
+            //Clone to avoid modifying the end location.
+            Location diff = event.getFrom().clone().subtract(event.getTo());
+            if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockY()) == 1 || Math.abs(diff.getBlockZ()) == 1) {
                 GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
                 gamePlayer.interruptCooldowns("Movement detected.");
             }
@@ -136,7 +138,7 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if (recentlyBadPlayers.contains(event.getEntity())) {
+        if (recentlyBadPlayers.contains(event.getEntity()) && event.getDeathMessage().contains("burned ")) {
             event.setDeathMessage(event.getEntity().getName() + " died of racism.");
             recentlyBadPlayers.remove(event.getEntity());
         }

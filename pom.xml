@@ -82,5 +82,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.9</version>
         </dependency>
+        <!--Jetbrains Annotations-->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>17.0.0</version>
+        </dependency>
     </dependencies>
 </project>
