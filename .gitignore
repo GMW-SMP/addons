@@ -16,3 +16,4 @@ dependency-reduced-pom.xml
 # I dont want it
 bin/
 src/test/
+scripts/

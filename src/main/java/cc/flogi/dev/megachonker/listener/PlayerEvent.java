@@ -127,7 +127,7 @@ public class PlayerEvent implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
-            //Clone to avoid modifying the end location.
+            //Clone to avoid modifying the from location.
             Location diff = event.getFrom().clone().subtract(event.getTo());
             if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockY()) == 1 || Math.abs(diff.getBlockZ()) == 1) {
                 GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());

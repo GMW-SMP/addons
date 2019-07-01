@@ -79,7 +79,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
                 String secondsString = seconds == 1 ? "second" : "seconds";
 
-                UtilUI.sendActionBar(player, String.format(message, String.format("%.2f", seconds), secondsString));
+                if (!isCancelled())
+                    UtilUI.sendActionBar(player, String.format(message, String.format("%.2f", seconds), secondsString));
 
                 seconds -= (countInterval / 20d);
             }
