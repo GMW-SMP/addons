@@ -20,45 +20,59 @@ import org.bukkit.command.CommandSender;
             int stay = 20;
             int fadeOut = 10;
             boolean writeToSubtitle = false;
+
             for (String string : args) {
-                if (string.startsWith("fadein:")) {
-                    fadeIn = Integer.parseInt(string.substring("fadein:".length()));
-                } else if (string.startsWith("stay:")) {
-                    stay = Integer.parseInt(string.substring("stay:".length()));
-                } else if (string.startsWith("fadeout:")) {
-                    fadeOut = Integer.parseInt(string.substring("fadeout:".length()));
-                } else {
-                    string = string.replaceFirst("[%{][Nn][Ll][%}]", "<nl>");
-                    String[] split = string.split("(?i)<nl>");
-
-                    if (split.length > 1) {
-                        title.append(title.toString().equals("") ? split[0] : " " + split[0]);
-                        subTitle = new StringBuilder(split[1]);
-                        if (split[1].equals("")) subTitle = new StringBuilder(" ");
-                        writeToSubtitle = true;
-                        continue;
-                    }
-
-                    if (!writeToSubtitle) {
-                        title.append(title.toString().equals("") ? string : " " + string);
+                try {
+                    if (string.startsWith("fadein:")) {
+                        fadeIn = Integer.parseInt(string.substring("fadein:".length()));
+                    } else if (string.startsWith("stay:")) {
+                        stay = Integer.parseInt(string.substring("stay:".length()));
+                    } else if (string.startsWith("fadeout:")) {
+                        fadeOut = Integer.parseInt(string.substring("fadeout:".length()));
                     } else {
-                        subTitle.append(" ").append(string);
+                        //Matches %nl% & {nl} case insensitive.
+                        string = string.replaceFirst("[%{][Nn][Ll][%}]", "<nl>");
+
+                        if (string.equalsIgnoreCase("<nl>")) {
+                            writeToSubtitle = true;
+                            continue;
+                        }
+
+                        if (string.contains("<nl>")) {
+                            String titleAppend = string.substring(0, string.indexOf("<nl>")).replace("<nl>", "");
+                            if (title.length() > 0)
+                                titleAppend = " " + titleAppend;
+                            title.append(titleAppend);
+
+                            subTitle.append(string.substring(string.indexOf("<nl>")).replace("<nl>", ""));
+                            writeToSubtitle = true;
+                            continue;
+                        }
+
+                        if (!writeToSubtitle) {
+                            title.append(title.toString().equals("") ? string : " " + string);
+                        } else {
+                            subTitle.append(" ").append(string);
+                        }
                     }
+                } catch (NumberFormatException ex) {
+                    sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7That's not a valid number!"));
+                    return true;
                 }
             }
 
-            String finalTitle = UtilUI.colorize(title.toString());
-            String finalSubtitle = UtilUI.colorize(subTitle.toString());
+            String finalTitle = UtilUI.colorize(title.toString()).replace("\\t", "    ");
+            String finalSubtitle = UtilUI.colorize(subTitle.toString()).replace("\\t", "    ");
             int finalFadeIn = fadeIn;
             int finalFadeOut = fadeOut;
             int finalStay = stay;
 
             Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(
-                                                              finalTitle,
-                                                              finalSubtitle,
-                                                              finalFadeIn,
-                                                              finalStay,
-                                                              finalFadeOut));
+                    finalTitle,
+                    finalSubtitle,
+                    finalFadeIn,
+                    finalStay,
+                    finalFadeOut));
         } else {
             sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7Insufficient permissions."));
         }

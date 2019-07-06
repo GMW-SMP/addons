@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
     private boolean recentlyBad;
     private ChatColor nameColor;
 
-    public GamePlayer(Player player) {
+    GamePlayer(Player player) {
         FileConfiguration config = Megachonker.getInstance().getConfig();
 
         this.player = player;
         activeCountdowns = new ArrayList<>();
 
-        String color = config.getString("players."+player.getUniqueId().toString()+".name-color");
+        String color = config.getString("players." + player.getUniqueId().toString() + ".name-color");
         if (color != null)
             nameColor = ChatColor.valueOf(color.toUpperCase());
     }

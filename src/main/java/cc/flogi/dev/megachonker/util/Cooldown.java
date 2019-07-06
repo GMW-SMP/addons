@@ -25,12 +25,12 @@ import org.bukkit.scheduler.BukkitRunnable;
     /**
      * Creates a cooldown object tied to a specific player.
      *
-     * @param player The player to tie the cooldown to.
-     * @param delay The delay of the cooldown in ticks.
-     * @param onCompletion The runnable to be run upon completion.
-     * @param message The message to be sent to the player every 2 ticks.
-     *                It will be formatted with two variables the first is the time remaining in seconds and the second is
-     *                a string with the word 'seconds' or 'second'.
+     * @param player        The player to tie the cooldown to.
+     * @param delay         The delay of the cooldown in ticks.
+     * @param onCompletion  The runnable to be run upon completion.
+     * @param message       The message to be sent to the player every 2 ticks.
+     *                      It will be formatted with two variables the first is the time remaining in seconds and the second is
+     *                      a string with the word 'seconds' or 'second'.
      * @param interruptable Should the cooldown be cancelled when the player moves or receives damage?
      */
     public Cooldown(Player player, int delay, Runnable onCompletion, String message, boolean interruptable) {
@@ -40,12 +40,12 @@ import org.bukkit.scheduler.BukkitRunnable;
     /**
      * Creates a cooldown object tied to a specific player.
      *
-     * @param player The player to tie the cooldown to.
-     * @param delay The delay of the cooldown in ticks.
-     * @param onCompletion The runnable to be run upon completion.
-     * @param message The message to be sent to the player every 2 ticks.
-     *                It will be formatted with two variables the first is the time remaining in seconds and the second is
-     *                a string with the word 'seconds' or 'second'.
+     * @param player        The player to tie the cooldown to.
+     * @param delay         The delay of the cooldown in ticks.
+     * @param onCompletion  The runnable to be run upon completion.
+     * @param message       The message to be sent to the player every 2 ticks.
+     *                      It will be formatted with two variables the first is the time remaining in seconds and the second is
+     *                      a string with the word 'seconds' or 'second'.
      * @param interruptable Should the cooldown be cancelled when the player moves or receives damage?
      */
     public Cooldown(Player player, int countInterval, int delay, Runnable onCompletion, String message, String completionMessage, boolean interruptable) {

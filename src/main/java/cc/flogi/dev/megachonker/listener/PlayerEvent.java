@@ -28,8 +28,8 @@ import java.util.Arrays;
  * Created on 2019-05-07
  */
 public class PlayerEvent implements Listener {
-    private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
     private final String[] blacklistedWords = new String[]{"nigga", "nigger", "chink"};
+    private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -45,13 +45,13 @@ public class PlayerEvent implements Listener {
 
             ChatColor nameColor = gp.getNameColor() == null ? ChatColor.GRAY : gp.getNameColor();
 
-            Bukkit.broadcastMessage(nameColor+player.getName()+ChatColor.GRAY+" has entered a bed.");
+            Bukkit.broadcastMessage(nameColor + player.getName() + ChatColor.GRAY + " has entered a bed.");
 
             ArrayList<Player> otherPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
             otherPlayers.remove(player);
 
             if (otherPlayers.size() == 0 || otherPlayers.stream().allMatch(Player::isSleeping))
-                Bukkit.broadcastMessage(ChatColor.GRAY+"All players are sleeping, cycling to daylight.");
+                Bukkit.broadcastMessage(ChatColor.GRAY + "All players are sleeping, cycling to daylight.");
         }
     }
 

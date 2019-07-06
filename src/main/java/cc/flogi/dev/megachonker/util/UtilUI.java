@@ -22,10 +22,10 @@ public class UtilUI {
     /**
      * Sends a player a title.
      *
-     * @param player The player to receive the title.
-     * @param title The text to be displayed. (Color codes supported)
-     * @param fadeIn The fade in duration in ticks.
-     * @param stay The stay duration in ticks.
+     * @param player  The player to receive the title.
+     * @param title   The text to be displayed. (Color codes supported)
+     * @param fadeIn  The fade in duration in ticks.
+     * @param stay    The stay duration in ticks.
      * @param fadeOut The fade out duration in ticks.
      */
     public static void sendTitle(Player player, String title, int fadeIn, int stay, int fadeOut) {
@@ -35,12 +35,12 @@ public class UtilUI {
     /**
      * Sends a player a title & subtitle.
      *
-     * @param player The player to receive the title.
-     * @param title The text to be displayed. (Color codes supported)
+     * @param player   The player to receive the title.
+     * @param title    The text to be displayed. (Color codes supported)
      * @param subtitle The subtitle text to be displayed. (Color codes supported)
-     * @param fadeIn The fade in duration in ticks.
-     * @param stay The stay duration in ticks.
-     * @param fadeOut The fade out duration in ticks.
+     * @param fadeIn   The fade in duration in ticks.
+     * @param stay     The stay duration in ticks.
+     * @param fadeOut  The fade out duration in ticks.
      */
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         player.sendTitle(colorize(title), colorize(subtitle), fadeIn, stay, fadeOut);

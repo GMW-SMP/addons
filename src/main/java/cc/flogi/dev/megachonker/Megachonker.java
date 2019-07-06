@@ -33,5 +33,6 @@ import org.bukkit.plugin.java.JavaPlugin;
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
     }
 
-    @Override public void onDisable() {}
+    @Override public void onDisable() {
+    }
 }
