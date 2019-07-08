@@ -1,6 +1,7 @@
 package cc.flogi.dev.megachonker.util;
 
 import net.md_5.bungee.api.ChatColor;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 
 /**
@@ -47,6 +48,24 @@ public class UtilUI {
     }
 
     /**
+     * Generates a progress bar with ChatColors.
+     *
+     * @param barSize The length of the progress bar.
+     * @param numerator The numerator of the fraction representing progress on the bar.
+     * @param denominator The denominator of the fraction representing progress on the bar.
+     * @param barChar The character the progress bar is made out of.
+     * @param used The color representing the used section of the bar.
+     * @param free The color representing the free section of the bar.
+     * @return The generated progress bar.
+     */
+    public static String progressBar(int barSize, double numerator, double denominator, char barChar, ChatColor used, ChatColor free) {
+        String bar = StringUtils.repeat(barChar, barSize);
+        int usedAmount = (int) (numerator / denominator * barSize);
+        bar = used + bar.substring(0, usedAmount) + free + bar.substring(usedAmount);
+        return bar;
+    }
+
+    /**
      * Shorthand notation for ${@link ChatColor#translateAlternateColorCodes(char, String)}.
      *
      * @param string The string to be colorized.
@@ -55,4 +74,6 @@ public class UtilUI {
     public static String colorize(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
+
+
 }

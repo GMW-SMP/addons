@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 
             if (player.getBedSpawnLocation() != null)
                 new Cooldown(player, 1, 100, () -> player.teleport(player.getBedSpawnLocation()),
-                        "&6Teleporting home in &e%s &6%s.", "&aTeleportation complete.", true).start();
+                        "&6Teleporting home... {2} &7(&e{0}s&7)", "&aTeleportation complete.", true).start();
         }
 
         return true;
