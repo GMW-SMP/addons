@@ -30,7 +30,7 @@ public class SetColorCommand implements CommandExecutor {
                     gamePlayer.setNameColor(color);
 
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                    sender.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Name color set to '" + color + color.name() + "&7'"));
+                    sender.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Name color set to '" + color + color.name() + "&7'"));
 
                     Megachonker.getInstance().getConfig().set("players." + player.getUniqueId().toString() + ".name-color", color.getName());
                     Megachonker.getInstance().saveConfig();
@@ -39,7 +39,7 @@ public class SetColorCommand implements CommandExecutor {
                 }
             }
 
-            sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7Invalid color, here's a list of colors to choose from:"));
+            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Invalid color, here's a list of colors to choose from:"));
             for (ChatColor value : ChatColor.values()) {
                 if (!value.name().equals("MAGIC"))
                     sender.sendMessage(value + "- " + value.getName());

@@ -27,8 +27,8 @@ import java.util.Arrays;
  *
  * Created on 2019-05-07
  */
-public class PlayerEvent implements Listener {
-    private final String[] blacklistedWords = new String[]{"nigga", "nigger", "chink"};
+@SuppressWarnings("ALL") public class PlayerEvent implements Listener {
+    private final String[] blacklistedWords = new String[]{"nigga", "nigger", "neegar", "kneegar"};
     private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -39,7 +39,7 @@ public class PlayerEvent implements Listener {
         if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
             if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Bed spawn location set. Use /home to teleport to this location."));
+                player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Bed spawn location set. Use /home to teleport to this location."));
                 UtilUI.sendActionBar(player, "Bed spawn location set.");
             }
 
@@ -61,13 +61,14 @@ public class PlayerEvent implements Listener {
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
 
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
-        event.setFormat(UtilUI.colorize(color + player.getName() + " &8: &f" + event.getMessage()));
+        event.setFormat(UtilUI.colorize(color + player.getName() + "&8: &7" + event.getMessage()));
 
         if (Arrays.stream(blacklistedWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
+            event.setCancelled(true);
             new BukkitRunnable() {
                 @Override public void run() {
                     recentlyBadPlayers.add(player);
-                    UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "BAD CHILD", "", 5, 70, 20);
+                    UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "Racism Gay", "", 5, 70, 20);
 
                     for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
@@ -81,7 +82,7 @@ public class PlayerEvent implements Listener {
                         @Override public void run() {
                             recentlyBadPlayers.remove(player);
                         }
-                    }.runTaskLater(Megachonker.getInstance(), 20 * 10L);
+                    }.runTaskLater(Megachonker.getInstance(), 20 * 20L);
                 }
             }.runTask(Megachonker.getInstance());
         }
@@ -89,8 +90,13 @@ public class PlayerEvent implements Listener {
         if (!event.isCancelled()) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {
-                    onlinePlayer.sendMessage(event.getFormat().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.RESET));
-                    onlinePlayer.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+                    onlinePlayer.sendMessage(event.getFormat().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.GRAY));
+
+                    new BukkitRunnable() {
+                        @Override public void run() {
+                            onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+                        }
+                    }.runTask(Megachonker.getInstance());
                 } else {
                     onlinePlayer.sendMessage(event.getFormat());
                 }
@@ -109,7 +115,7 @@ public class PlayerEvent implements Listener {
                 if (event.getSlot() == 2 && event.getCurrentItem() != null && event.getCurrentItem().getItemMeta().hasDisplayName()) {
                     if (event.getCurrentItem().getItemMeta().getDisplayName().contains("\u00A7")) {
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                        player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Colorized item name."));
+                        player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Colorized item name."));
                     }
                 }
             }
@@ -138,8 +144,8 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if (recentlyBadPlayers.contains(event.getEntity()) && event.getDeathMessage().contains("burned ")) {
-            event.setDeathMessage(event.getEntity().getName() + " died of racism.");
+        if (recentlyBadPlayers.contains(event.getEntity()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
+            event.setDeathMessage(event.getEntity().getName() + " died of racism");
             recentlyBadPlayers.remove(event.getEntity());
         }
     }

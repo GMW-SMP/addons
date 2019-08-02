@@ -28,7 +28,7 @@ public class BlockEvent implements Listener {
         Player player = event.getPlayer();
         if (Arrays.stream(event.getLines()).anyMatch(line -> line.contains("\u00A7"))) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-            player.sendMessage(UtilUI.colorize("&8[&aMegachonker&8] &7Colorized sign text."));
+            player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Colorized sign text."));
         }
     }
 

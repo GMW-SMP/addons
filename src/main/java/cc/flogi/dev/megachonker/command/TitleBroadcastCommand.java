@@ -56,7 +56,7 @@ import org.bukkit.command.CommandSender;
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7That's not a valid number!"));
+                    sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7That's not a valid number!"));
                     return true;
                 }
             }
@@ -74,7 +74,7 @@ import org.bukkit.command.CommandSender;
                     finalStay,
                     finalFadeOut));
         } else {
-            sender.sendMessage(UtilUI.colorize("&8[&cMegachonker&8] &7Insufficient permissions."));
+            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Insufficient permissions."));
         }
 
         return true;

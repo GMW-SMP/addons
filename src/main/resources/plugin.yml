@@ -1,13 +1,13 @@
-name: Megachonker
+name: SMP
 version: ${project.version}
 description: ${project.description}
 main: cc.flogi.dev.megachonker.Megachonker
 api-version: 1.13
-prefix: Megachonker
+prefix: SMP
 authors: [flogic]
 commands:
-  home:
-    description: Teleports you to your bed location.
+  #home:
+  #  description: Teleports you to your bed location.
   setcolor:
     description: Sets the color of your name in chat.
   titlebroadcast:
