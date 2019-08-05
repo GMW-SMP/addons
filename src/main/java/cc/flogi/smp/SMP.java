@@ -1,17 +1,17 @@
-package cc.flogi.dev.megachonker;
+package cc.flogi.smp;
 
-import cc.flogi.dev.megachonker.command.SetColorCommand;
-import cc.flogi.dev.megachonker.command.TitleBroadcastCommand;
-import cc.flogi.dev.megachonker.listener.BlockEvent;
-import cc.flogi.dev.megachonker.listener.PlayerEvent;
-import cc.flogi.dev.megachonker.player.PlayerManager;
+import cc.flogi.smp.command.SetColorCommand;
+import cc.flogi.smp.command.TitleBroadcastCommand;
+import cc.flogi.smp.listener.BlockEvent;
+import cc.flogi.smp.listener.PlayerEvent;
+import cc.flogi.smp.player.PlayerManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@SuppressWarnings("ConstantConditions") public final class Megachonker extends JavaPlugin {
-    @Getter private static Megachonker instance;
+@SuppressWarnings("ConstantConditions") public final class SMP extends JavaPlugin {
+    @Getter private static SMP instance;
 
     @Override public void onEnable() {
         instance = this;

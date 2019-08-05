@@ -5,19 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cc.flogi.dev</groupId>
-    <artifactId>megachonker</artifactId>
+    <artifactId>smp</artifactId>
     <version>1.0.2</version>
     <packaging>jar</packaging>
 
-    <name>Megachonker</name>
+    <name>SMP</name>
 
-    <description>Core operations of Megachonker server.</description>
+    <description>Assisting plugin for an SMP server.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <build>
-        <finalName>megachonker</finalName>
+        <finalName>SMP</finalName>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>

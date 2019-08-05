@@ -1,8 +1,8 @@
-package cc.flogi.dev.megachonker.util;
+package cc.flogi.smp.util;
 
-import cc.flogi.dev.megachonker.Megachonker;
-import cc.flogi.dev.megachonker.player.GamePlayer;
-import cc.flogi.dev.megachonker.player.PlayerManager;
+import cc.flogi.smp.SMP;
+import cc.flogi.smp.player.GamePlayer;
+import cc.flogi.smp.player.PlayerManager;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -102,8 +102,8 @@ import java.text.MessageFormat;
     }
 
     public void start() {
-        task.runTaskLater(Megachonker.getInstance(), delay);
-        timerTask.runTaskTimer(Megachonker.getInstance(), 0L, 1L);
+        task.runTaskLater(SMP.getInstance(), delay);
+        timerTask.runTaskTimer(SMP.getInstance(), 0L, 1L);
     }
 
     public void cancel() {

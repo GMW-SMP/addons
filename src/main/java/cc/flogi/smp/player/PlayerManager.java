@@ -1,4 +1,4 @@
-package cc.flogi.dev.megachonker.player;
+package cc.flogi.smp.player;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;

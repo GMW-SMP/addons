@@ -1,9 +1,9 @@
-package cc.flogi.dev.megachonker.listener;
+package cc.flogi.smp.listener;
 
-import cc.flogi.dev.megachonker.Megachonker;
-import cc.flogi.dev.megachonker.player.GamePlayer;
-import cc.flogi.dev.megachonker.player.PlayerManager;
-import cc.flogi.dev.megachonker.util.UtilUI;
+import cc.flogi.smp.SMP;
+import cc.flogi.smp.player.GamePlayer;
+import cc.flogi.smp.player.PlayerManager;
+import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -52,6 +52,26 @@ import java.util.Arrays;
 
             if (otherPlayers.size() == 0 || otherPlayers.stream().allMatch(Player::isSleeping))
                 Bukkit.broadcastMessage(ChatColor.GRAY + "All players are sleeping, cycling to daylight.");
+
+            //Send action bar to players who are sleeping.
+            new BukkitRunnable() {
+                @Override public void run() {
+                    if (player.isSleeping()) {
+                        new BukkitRunnable() {
+                            @Override public void run() {
+                                int sleepingPlayers = (int) Bukkit.getOnlinePlayers()
+                                                               .stream()
+                                                               .filter(p -> ((Player) p).isSleeping())
+                                                               .count();
+                                int onlinePlayers = Bukkit.getOnlinePlayers().size();
+
+                                UtilUI.sendActionBar(player, ChatColor.GRAY.toString() + sleepingPlayers + "/" + onlinePlayers + " in bed.");
+                            }
+                        }.runTask(SMP.getInstance());
+                    } else
+                        this.cancel();
+                }
+            }.runTaskTimerAsynchronously(SMP.getInstance(), 20L, 50L);
         }
     }
 
@@ -75,16 +95,16 @@ import java.util.Arrays;
                             @Override public void run() {
                                 player.getWorld().strikeLightning(player.getLocation());
                             }
-                        }.runTaskLater(Megachonker.getInstance(), i * 3);
+                        }.runTaskLater(SMP.getInstance(), i * 3);
                     }
 
                     new BukkitRunnable() {
                         @Override public void run() {
                             recentlyBadPlayers.remove(player);
                         }
-                    }.runTaskLater(Megachonker.getInstance(), 20 * 20L);
+                    }.runTaskLater(SMP.getInstance(), 20 * 20L);
                 }
-            }.runTask(Megachonker.getInstance());
+            }.runTask(SMP.getInstance());
         }
 
         if (!event.isCancelled()) {
@@ -96,7 +116,7 @@ import java.util.Arrays;
                         @Override public void run() {
                             onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                         }
-                    }.runTask(Megachonker.getInstance());
+                    }.runTask(SMP.getInstance());
                 } else {
                     onlinePlayer.sendMessage(event.getFormat());
                 }

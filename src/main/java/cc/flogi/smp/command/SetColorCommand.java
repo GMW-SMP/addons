@@ -1,9 +1,9 @@
-package cc.flogi.dev.megachonker.command;
+package cc.flogi.smp.command;
 
-import cc.flogi.dev.megachonker.Megachonker;
-import cc.flogi.dev.megachonker.player.GamePlayer;
-import cc.flogi.dev.megachonker.player.PlayerManager;
-import cc.flogi.dev.megachonker.util.UtilUI;
+import cc.flogi.smp.SMP;
+import cc.flogi.smp.player.GamePlayer;
+import cc.flogi.smp.player.PlayerManager;
+import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Sound;
@@ -32,8 +32,8 @@ public class SetColorCommand implements CommandExecutor {
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                     sender.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Name color set to '" + color + color.name() + "&7'"));
 
-                    Megachonker.getInstance().getConfig().set("players." + player.getUniqueId().toString() + ".name-color", color.getName());
-                    Megachonker.getInstance().saveConfig();
+                    SMP.getInstance().getConfig().set("players." + player.getUniqueId().toString() + ".name-color", color.getName());
+                    SMP.getInstance().saveConfig();
 
                     return true;
                 }

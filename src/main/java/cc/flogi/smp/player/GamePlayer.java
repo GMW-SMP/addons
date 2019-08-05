@@ -1,8 +1,8 @@
-package cc.flogi.dev.megachonker.player;
+package cc.flogi.smp.player;
 
-import cc.flogi.dev.megachonker.Megachonker;
-import cc.flogi.dev.megachonker.util.Cooldown;
-import cc.flogi.dev.megachonker.util.UtilUI;
+import cc.flogi.smp.SMP;
+import cc.flogi.smp.util.Cooldown;
+import cc.flogi.smp.util.UtilUI;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
     private ChatColor nameColor;
 
     GamePlayer(Player player) {
-        FileConfiguration config = Megachonker.getInstance().getConfig();
+        FileConfiguration config = SMP.getInstance().getConfig();
 
         this.player = player;
         activeCountdowns = new ArrayList<>();

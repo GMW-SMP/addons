@@ -1,6 +1,6 @@
-package cc.flogi.dev.megachonker.listener;
+package cc.flogi.smp.listener;
 
-import cc.flogi.dev.megachonker.util.UtilUI;
+import cc.flogi.smp.util.UtilUI;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

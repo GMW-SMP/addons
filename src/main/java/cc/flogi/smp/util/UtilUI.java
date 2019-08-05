@@ -1,4 +1,4 @@
-package cc.flogi.dev.megachonker.util;
+package cc.flogi.smp.util;
 
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.StringUtils;

@@ -1,6 +1,6 @@
-package cc.flogi.dev.megachonker.command;
+package cc.flogi.smp.command;
 
-import cc.flogi.dev.megachonker.util.UtilUI;
+import cc.flogi.smp.util.UtilUI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
