@@ -38,13 +38,14 @@ import java.util.Arrays;
 
         if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
             if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Bed spawn location set. Use /home to teleport to this location."));
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+                player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Bed spawn location set."));
                 UtilUI.sendActionBar(player, "Bed spawn location set.");
             }
 
             ChatColor nameColor = gp.getNameColor() == null ? ChatColor.GRAY : gp.getNameColor();
 
+            Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1));
             Bukkit.broadcastMessage(nameColor + player.getName() + ChatColor.GRAY + " has entered a bed.");
 
             ArrayList<Player> otherPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -71,7 +72,7 @@ import java.util.Arrays;
                     } else
                         this.cancel();
                 }
-            }.runTaskTimerAsynchronously(SMP.getInstance(), 20L, 50L);
+            }.runTaskTimerAsynchronously(SMP.getInstance(), 20L, 35L);
         }
     }
 
