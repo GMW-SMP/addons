@@ -186,6 +186,7 @@ import java.util.Arrays;
     public void onQuit(PlayerQuitEvent event) {
         PlayerManager.getInstance().playerLogout(event.getPlayer());
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        gamePlayer.save();
 
         event.setQuitMessage("");
 

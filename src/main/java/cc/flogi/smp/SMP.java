@@ -1,5 +1,6 @@
 package cc.flogi.smp;
 
+import cc.flogi.smp.command.BookmarkCommand;
 import cc.flogi.smp.command.SetColorCommand;
 import cc.flogi.smp.command.TitleBroadcastCommand;
 import cc.flogi.smp.listener.BlockEvent;
@@ -27,11 +28,9 @@ import org.bukkit.plugin.java.JavaPlugin;
         getCommand("setcolor").setExecutor(new SetColorCommand());
         getCommand("titlebroadcast").setExecutor(new TitleBroadcastCommand());
         getCommand("tbc").setExecutor(new TitleBroadcastCommand());
+        getCommand("bookmark").setExecutor(new BookmarkCommand());
 
         //Classes
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
-    }
-
-    @Override public void onDisable() {
     }
 }
