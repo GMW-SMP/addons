@@ -66,7 +66,8 @@ import java.util.Arrays;
                                                                .count();
                                 int onlinePlayers = Bukkit.getOnlinePlayers().size();
 
-                                UtilUI.sendActionBar(player, ChatColor.GRAY.toString() + sleepingPlayers + "/" + onlinePlayers + " in bed.");
+                                UtilUI.sendActionBar(player, ChatColor.GRAY.toString() +
+                                                sleepingPlayers + "/" + onlinePlayers + " players in bed.");
                             }
                         }.runTask(SMP.getInstance());
                     } else
