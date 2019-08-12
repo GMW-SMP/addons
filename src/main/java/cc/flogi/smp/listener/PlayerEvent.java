@@ -124,6 +124,7 @@ import java.util.Arrays;
                 }
             }
 
+            Bukkit.getConsoleSender().sendMessage(event.getFormat());
             event.setCancelled(true);
         }
     }
