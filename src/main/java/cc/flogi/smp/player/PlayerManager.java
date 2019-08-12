@@ -1,11 +1,18 @@
 package cc.flogi.smp.player;
 
+import cc.flogi.smp.SMP;
+import cc.flogi.smp.util.UtilFile;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -15,10 +22,22 @@ import java.util.stream.Collectors;
  * Created on 2019-05-08
  */
 public class PlayerManager {
+    private final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+
     @Getter private static PlayerManager instance = new PlayerManager();
     @Getter private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
+    @Getter private File dataDir = new File(SMP.getInstance().getDataFolder().getPath()+"/data");
 
     private PlayerManager() {
+        if (!dataDir.exists()) {
+            try {
+                if (!dataDir.mkdirs()) {
+                    throw new IOException("Failed to create data directory.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -44,7 +63,7 @@ public class PlayerManager {
     }
 
     public void addPlayers(Player... players) {
-        gamePlayers.addAll(Arrays.stream(players).map(GamePlayer::new).collect(Collectors.toList()));
+        gamePlayers.addAll(Arrays.stream(players).map(this::loadFromFile).collect(Collectors.toList()));
     }
 
     public void removePlayers(Player... players) {
@@ -54,9 +73,50 @@ public class PlayerManager {
     public void playerLogout(Player player) {
         new BukkitRunnable() {
             @Override public void run() {
-                if (!player.isOnline())
+                if (!player.isOnline()) {
+                    saveToFile(getGamePlayer(player));
                     removePlayers(player);
+                }
             }
         };
+    }
+
+    public GamePlayer loadFromFile(Player player) {
+        File dataFile = getDataFile(player);
+        if (dataFile == null) {
+            return new GamePlayer(player);
+        }
+
+        String serializedData = UtilFile.read(dataFile);
+
+        GamePlayer gamePlayer = GSON.fromJson(serializedData, GamePlayer.class);
+        gamePlayer.setPlayer(player);
+        gamePlayer.setActiveCountdowns(new ArrayList<>());
+        return gamePlayer;
+    }
+
+    public void saveToFile(GamePlayer player) {
+        new BukkitRunnable() {
+            @Override public void run() {
+                UtilFile.writeAndCreate(player, getDataFile(player.getPlayer()));
+            }
+        }.runTaskAsynchronously(SMP.getInstance());
+    }
+
+    private File getDataFile(Player player) {
+        File dataFile = new File(dataDir.getAbsolutePath() + "/" + player.getUniqueId().toString() + ".json");
+        if (!dataFile.exists()) {
+            try {
+                if (!dataFile.createNewFile()) {
+                    throw new IOException("Failed to create data file for '" + player.getName() + "'.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        return dataFile;
     }
 }

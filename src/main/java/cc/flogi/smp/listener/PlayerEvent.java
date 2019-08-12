@@ -154,10 +154,10 @@ import java.util.Arrays;
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
-            //Clone to avoid modifying the from location.
-            Location diff = event.getFrom().clone().subtract(event.getTo());
-            if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockY()) == 1 || Math.abs(diff.getBlockZ()) == 1) {
+        //Clone to avoid modifying the from location.
+        Location diff = event.getFrom().clone().subtract(event.getTo());
+        if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockY()) == 1 || Math.abs(diff.getBlockZ()) == 1) {
+            if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
                 GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
                 gamePlayer.interruptCooldowns("Movement detected.");
             }
@@ -187,7 +187,6 @@ import java.util.Arrays;
     public void onQuit(PlayerQuitEvent event) {
         PlayerManager.getInstance().playerLogout(event.getPlayer());
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
-        gamePlayer.save();
 
         event.setQuitMessage("");
 

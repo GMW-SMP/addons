@@ -1,6 +1,5 @@
 package cc.flogi.smp.command;
 
-import cc.flogi.smp.SMP;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilUI;
@@ -28,12 +27,10 @@ public class SetColorCommand implements CommandExecutor {
                 if (EnumUtils.isValidEnum(ChatColor.class, args[0].toUpperCase())) {
                     ChatColor color = ChatColor.valueOf(args[0].toUpperCase());
                     gamePlayer.setNameColor(color);
+                    PlayerManager.getInstance().saveToFile(gamePlayer);
 
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                     sender.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Name color set to '" + color + color.name() + "&7'"));
-
-                    SMP.getInstance().getConfig().set("players." + player.getUniqueId().toString() + ".name-color", color.getName());
-                    SMP.getInstance().saveConfig();
 
                     return true;
                 }

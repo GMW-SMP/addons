@@ -6,8 +6,6 @@ api-version: 1.13
 prefix: SMP
 authors: [flogic]
 commands:
-  #home:
-  #  description: Teleports you to your bed location.
   setcolor:
     description: Sets the color of your name in chat.
   titlebroadcast:
