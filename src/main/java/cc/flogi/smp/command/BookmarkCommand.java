@@ -5,6 +5,8 @@ import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.BookGUI;
 import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -28,19 +30,21 @@ public class BookmarkCommand implements CommandExecutor {
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("list")) {
-                    StringBuilder bookmarks = new StringBuilder();
+                    ComponentBuilder builder = new ComponentBuilder(new TextComponent());
 
                     //TODO NPE on next line?
-                    gp.getBookmarks().forEach(mark -> bookmarks.append(ChatColor.RED)
+                    gp.getBookmarks().forEach(mark -> builder.color(ChatColor.RED)
                                                               .append(mark.getName())
                                                               .append(" &7&l| &a")
-                                                              .append(mark.getX())
+                                                              .append(String.valueOf(mark.getX()))
                                                               .append(", ")
-                                                              .append(mark.getY())
+                                                              .append(String.valueOf(mark.getY()))
                                                               .append(", ")
-                                                              .append(mark.getZ()));
+                                                              .append(String.valueOf(mark.getZ())));
 
-                    new BookGUI(Collections.singletonList(bookmarks.toString())).open(player);
+                    new BookGUI(Collections.singletonList(builder.create())).open(player);
+                } else if (args[0].equalsIgnoreCase("edit")) {
+
                 }
             }
 

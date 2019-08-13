@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -83,7 +82,7 @@ public class PlayerManager {
 
     public GamePlayer loadFromFile(Player player) {
         File dataFile = getDataFile(player);
-        if (dataFile == null) {
+        if (dataFile == null || dataFile.length() < 4) {
             return new GamePlayer(player);
         }
 

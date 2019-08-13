@@ -5,6 +5,7 @@ main: cc.flogi.smp.SMP
 api-version: 1.13
 prefix: SMP
 authors: [flogic]
+depend: [ProtocolLib]
 commands:
   setcolor:
     description: Sets the color of your name in chat.
