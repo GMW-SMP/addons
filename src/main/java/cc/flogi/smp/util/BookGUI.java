@@ -40,7 +40,7 @@ public class BookGUI {
     public void open(Player player) {
         ProtocolManager protocol = SMP.getInstance().getProtocolManager();
 
-        PacketContainer bookPacket = protocol.createPacket(PacketType.Play.Client.BOOK_EDIT);
+        PacketContainer bookPacket = protocol.createPacket(PacketType.Play.Server.OPEN_BOOK);
 
         bookPacket.getItemModifier().write(0, book);
         //Signing =  false;

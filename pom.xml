@@ -6,7 +6,7 @@
 
     <groupId>cc.flogi.dev</groupId>
     <artifactId>smp</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>SMP</name>
@@ -68,7 +68,7 @@
         <!-- Flogic Resources -->
         <repository>
             <id>flogic-resources</id>
-            <url>http://repo.flogi.cc/artifactory/flogic-resources</url>
+            <url>https://repo.flogi.cc/artifactory/flogic-resources</url>
         </repository>
         <!-- ProtocolLib -->
         <repository>
@@ -95,7 +95,8 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.5.0-20190813.015313-1</version>
+            <version>4.5.0-20190813.231230-1</version>
+            <scope>provided</scope>
         </dependency>
         <!--Lombok-->
         <dependency>
