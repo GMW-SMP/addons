@@ -29,6 +29,9 @@ import org.bukkit.plugin.java.JavaPlugin;
         getCommand("titlebroadcast").setExecutor(new TitleBroadcastCommand());
         getCommand("tbc").setExecutor(new TitleBroadcastCommand());
         getCommand("bookmark").setExecutor(new BookmarkCommand());
+        getCommand("bm").setExecutor(new BookmarkCommand());
+        getCommand("bookmarks").setExecutor(new BookmarkCommand());
+        getCommand("marks").setExecutor(new BookmarkCommand());
 
         //Classes
         protocolManager = ProtocolLibrary.getProtocolManager();

@@ -3,7 +3,6 @@ package cc.flogi.smp.player;
 import cc.flogi.smp.SMP;
 import cc.flogi.smp.util.UtilFile;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
  * Created on 2019-05-08
  */
 public class PlayerManager {
-    private final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    private final Gson GSON = new Gson();
 
     @Getter private static PlayerManager instance = new PlayerManager();
     @Getter private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
@@ -89,6 +88,7 @@ public class PlayerManager {
         String serializedData = UtilFile.read(dataFile);
 
         GamePlayer gamePlayer = GSON.fromJson(serializedData, GamePlayer.class);
+
         gamePlayer.setPlayer(player);
         gamePlayer.setActiveCountdowns(new ArrayList<>());
         return gamePlayer;

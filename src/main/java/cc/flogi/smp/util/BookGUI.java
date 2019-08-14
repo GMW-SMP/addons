@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Caden Kriese (flogic)
@@ -30,13 +31,17 @@ public class BookGUI {
         book.setItemMeta(meta);
     }
 
-//    public BookGUI(List<String> pages) {
-//        book = new ItemStack(Material.WRITTEN_BOOK);
-//        BookMeta meta = (BookMeta) book.getItemMeta();
-//        meta.setPages(pages.stream().map(UtilUI::colorize).collect(Collectors.toList()));
-//
-//        book.setItemMeta(meta);
-//    }
+    public BookGUI(List<String> pages, boolean colorize) {
+        book = new ItemStack(Material.WRITTEN_BOOK);
+        BookMeta meta = (BookMeta) book.getItemMeta();
+
+        if (colorize)
+            meta.setPages(pages.stream().map(UtilUI::colorize).collect(Collectors.toList()));
+        else
+            meta.setPages(pages);
+
+        book.setItemMeta(meta);
+    }
 
     public void open(Player player) {
         ItemStack previousItem = player.getInventory().getItemInMainHand();

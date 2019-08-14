@@ -3,6 +3,7 @@ package cc.flogi.smp.player;
 import cc.flogi.smp.player.data.Bookmark;
 import cc.flogi.smp.util.Cooldown;
 import cc.flogi.smp.util.UtilUI;
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
     private transient ArrayList<Cooldown> activeCountdowns = new ArrayList<>();
 
     //Serialized
-    private String nameColor;
-    private List<Bookmark> bookmarks;
+    @SerializedName("name-color") private String nameColor;
+    @SerializedName("bookmarks") private List<Bookmark> bookmarks;
 
     GamePlayer(Player player) {
         this.player = player;
@@ -60,6 +61,17 @@ import java.util.stream.Collectors;
             bookmarks = new ArrayList<>();
 
         return bookmarks;
+    }
+
+    public boolean removeBookmark(String name) {
+        Bookmark bookmark = bookmarks.stream()
+                                    .filter(mark -> mark.getName().equalsIgnoreCase(name))
+                                    .findFirst()
+                                    .orElse(null);
+
+        bookmarks.remove(bookmark);
+
+        return bookmark != null;
     }
 
     public void setNameColor(ChatColor nameColor) {

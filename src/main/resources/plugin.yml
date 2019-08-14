@@ -13,4 +13,8 @@ commands:
     aliases: tbc
     description: Sends a title to all the online players, seperate subtitle with <nl>.
   bookmark:
+    aliases: bm
     description: Adds your current location to ur bookmarks.
+  bookmarks:
+    aliases: marks
+    description: Displays your bookmarks.

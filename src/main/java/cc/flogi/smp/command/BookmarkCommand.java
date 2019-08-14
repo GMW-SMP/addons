@@ -2,11 +2,11 @@ package cc.flogi.smp.command;
 
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
+import cc.flogi.smp.player.data.Bookmark;
 import cc.flogi.smp.util.BookGUI;
 import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -15,7 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Caden Kriese (flogic)
@@ -28,23 +29,117 @@ public class BookmarkCommand implements CommandExecutor {
             Player player = (Player) sender;
             GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
 
+            if (label.equalsIgnoreCase("bookmarks") || label.equalsIgnoreCase("marks"))
+                args = new String[]{"list"};
+
             if (args.length > 0) {
+                ArrayList<BaseComponent[]> pages = new ArrayList<>();
+                ComponentBuilder builder = new ComponentBuilder(new TextComponent());
+
                 if (args[0].equalsIgnoreCase("list")) {
-                    ComponentBuilder builder = new ComponentBuilder(new TextComponent());
+                    int bookmarkIndex = 0;
+                    for (int page = 0; page <= gp.getBookmarks().size() / 13; page++) {
+                        for (int line = 0; line < 14; line++) {
+                            if (line == 13) {
+                                builder.append("EDIT")
+                                        .color(ChatColor.DARK_GREEN)
+                                        .bold(true)
+                                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to edit your bookmarks.")
+                                                                                                   .color(ChatColor.GREEN).create()))
+                                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmark edit"));
 
-                    //TODO NPE on next line?
-                    gp.getBookmarks().forEach(mark -> builder.color(ChatColor.RED)
-                                                              .append(mark.getName())
-                                                              .append(" &7&l| &a")
-                                                              .append(String.valueOf(mark.getX()))
-                                                              .append(", ")
-                                                              .append(String.valueOf(mark.getY()))
-                                                              .append(", ")
-                                                              .append(String.valueOf(mark.getZ())));
+                                continue;
+                            }
 
-                    new BookGUI(Collections.singletonList(builder.create())).open(player);
+                            if (bookmarkIndex < gp.getBookmarks().size()) {
+                                Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
+
+                                String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
+
+                                builder.color(ChatColor.GOLD)
+                                        .append(mark.getName())
+                                        .append(UtilUI.colorize("&7&l|"))
+                                        .append(cordsString)
+                                        .color(ChatColor.GREEN);
+
+                                //If the characters wrap to next line.
+                                if (cordsString.length() + mark.getName().length() > 19)
+                                    line++;
+
+                                bookmarkIndex++;
+                            }
+
+                            builder.append("\n");
+                        }
+
+                        pages.add(builder.create());
+                        builder = new ComponentBuilder(new TextComponent());
+                    }
+
+                    new BookGUI(pages).open(player);
+                    return true;
                 } else if (args[0].equalsIgnoreCase("edit")) {
+                    int bookmarkIndex = 0;
+                    for (int page = 0; page <= gp.getBookmarks().size() / 13; page++) {
+                        for (int line = 0; line < 14; line++) {
+                            if (line == 13) {
+                                builder.append("BACK")
+                                        .color(ChatColor.DARK_RED)
+                                        .bold(true)
+                                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Return to bookmarks list.")
+                                                                                                   .color(ChatColor.RED).create()))
+                                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmarks"));
 
+                                continue;
+                            }
+
+                            if (bookmarkIndex < gp.getBookmarks().size()) {
+                                Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
+
+                                String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
+
+                                builder.color(ChatColor.GOLD)
+                                        .append(mark.getName())
+                                        .append(UtilUI.colorize("&7&l|"))
+                                        .append(cordsString)
+                                        .color(ChatColor.GREEN)
+                                        .append(" [-]")
+                                        .color(ChatColor.RED)
+                                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to remove '" + mark.getName() + "'.")
+                                                                                                   .color(ChatColor.RED).create()))
+                                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmark remove " + mark.getName()));
+
+                                //If the characters wrap to next line.
+                                if (cordsString.length() + mark.getName().length() + 2 > 19)
+                                    line++;
+
+                                bookmarkIndex++;
+                            }
+
+                            builder.append("\n");
+                        }
+
+                        pages.add(builder.create());
+                        builder = new ComponentBuilder(new TextComponent());
+                    }
+
+                    new BookGUI(pages).open(player);
+                    return true;
+                } else if (args[0].equalsIgnoreCase("remove")) {
+                    if (args.length > 1) {
+                        String name = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), ' ');
+                        if (gp.removeBookmark(name)) {
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                            player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Successfully removed bookmark &f'" + name + "'&7."));
+                        } else {
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                            player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Could not find bookmark with name &f'" + name + "'&7."));
+                        }
+
+                        player.performCommand("bookmark edit");
+                    } else
+                        player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Please enter a bookmark to remove."));
+                    return true;
                 }
             }
 
@@ -54,7 +149,8 @@ public class BookmarkCommand implements CommandExecutor {
 
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
             player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Added location to your bookmarks."));
-        }
+        } else
+            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You must be a player to do this command."));
 
         return false;
     }
