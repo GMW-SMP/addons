@@ -81,11 +81,11 @@ public class PlayerEvent implements Listener {
                                 UtilUI.sendActionBar(player, ChatColor.GRAY.toString() +
                                         sleepingPlayers + "/" + onlinePlayers + " players in bed.");
                             }
-                        }.runTask(SMP.getINSTANCE());
+                        }.runTask(SMP.get());
                     } else
                         this.cancel();
                 }
-            }.runTaskTimerAsynchronously(SMP.getINSTANCE(), 20L, 35L);
+            }.runTaskTimerAsynchronously(SMP.get(), 20L, 35L);
         }
     }
 
@@ -111,7 +111,7 @@ public class PlayerEvent implements Listener {
                             public void run() {
                                 player.getWorld().strikeLightning(player.getLocation());
                             }
-                        }.runTaskLater(SMP.getINSTANCE(), i * 3);
+                        }.runTaskLater(SMP.get(), i * 3);
                     }
 
                     new BukkitRunnable() {
@@ -119,9 +119,9 @@ public class PlayerEvent implements Listener {
                         public void run() {
                             recentlyBadPlayers.remove(player);
                         }
-                    }.runTaskLater(SMP.getINSTANCE(), 20 * 20L);
+                    }.runTaskLater(SMP.get(), 20 * 20L);
                 }
-            }.runTask(SMP.getINSTANCE());
+            }.runTask(SMP.get());
         }
 
         if (!event.isCancelled()) {
@@ -134,7 +134,7 @@ public class PlayerEvent implements Listener {
                         public void run() {
                             onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                         }
-                    }.runTask(SMP.getINSTANCE());
+                    }.runTask(SMP.get());
                 } else {
                     onlinePlayer.sendMessage(event.getFormat());
                 }

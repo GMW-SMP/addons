@@ -17,7 +17,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("ConstantConditions")
 public final class SMP extends JavaPlugin {
-    @Getter
     private static SMP INSTANCE;
     @Getter
     private ProtocolManager protocolManager;
