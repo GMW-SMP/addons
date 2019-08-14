@@ -47,7 +47,7 @@ public class BookGUI {
         ItemStack previousItem = player.getInventory().getItemInMainHand();
         player.getInventory().setItemInMainHand(book);
 
-        ProtocolManager protocol = SMP.getInstance().getProtocolManager();
+        ProtocolManager protocol = SMP.get().getProtocolManager();
         PacketContainer bookPacket = protocol.createPacket(PacketType.Play.Server.OPEN_BOOK);
         bookPacket.getHands().write(0, EnumWrappers.Hand.MAIN_HAND);
 

@@ -3,6 +3,8 @@ package cc.flogi.smp;
 import cc.flogi.smp.command.BookmarkCommand;
 import cc.flogi.smp.command.SetColorCommand;
 import cc.flogi.smp.command.TitleBroadcastCommand;
+import cc.flogi.smp.database.InfluxDatabase;
+import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
@@ -13,15 +15,36 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@SuppressWarnings("ConstantConditions") public final class SMP extends JavaPlugin {
-    @Getter private static SMP instance;
-    @Getter private ProtocolManager protocolManager;
+@SuppressWarnings("ConstantConditions")
+public final class SMP extends JavaPlugin {
+    @Getter
+    private static SMP INSTANCE;
+    @Getter
+    private ProtocolManager protocolManager;
+    @Getter
+    private InfluxDatabase influxDatabase;
 
-    @Override public void onEnable() {
-        instance = this;
+    @Override
+    public void onEnable() {
+        INSTANCE = this;
+
+        // Influx
+        influxDatabase = new InfluxDatabase(
+                "http://127.0.0.1:8086",
+                "smp",
+                "ilovetomine"
+        ).withDatabase(
+                "smp",
+                InfluxRetentionPolicy.builder()
+                        .name("defaultPolicy")
+                        .duration("30d")
+                        .replicationPolicy(1)
+                        .isDefault(true)
+                        .build()
+        );
 
         //Events
-        Bukkit.getPluginManager().registerEvents(new PlayerEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerEvent(influxDatabase), this);
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
@@ -36,5 +59,9 @@ import org.bukkit.plugin.java.JavaPlugin;
         //Classes
         protocolManager = ProtocolLibrary.getProtocolManager();
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
+    }
+
+    public static SMP get() {
+        return INSTANCE;
     }
 }

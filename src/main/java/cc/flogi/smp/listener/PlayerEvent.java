@@ -1,6 +1,7 @@
 package cc.flogi.smp.listener;
 
 import cc.flogi.smp.SMP;
+import cc.flogi.smp.database.InfluxDatabase;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilUI;
@@ -18,18 +19,27 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.influxdb.dto.Point;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * @author Caden Kriese (flogic)
- *
+ * <p>
  * Created on 2019-05-07
  */
-@SuppressWarnings("ALL") public class PlayerEvent implements Listener {
+@SuppressWarnings("ALL")
+public class PlayerEvent implements Listener {
+
+    // Influx
+    private final InfluxDatabase influxDatabase;
+
     private final String[] blacklistedWords = new String[]{"nigga", "nigger", "neegar", "kneegar"};
-    private ArrayList<Player> recentlyBadPlayers = new ArrayList<>();
+    private final Set<UUID> recentlyBadPlayers = new HashSet<>();
+
+    public PlayerEvent(InfluxDatabase influxDatabase) {
+        this.influxDatabase = influxDatabase;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -56,24 +66,26 @@ import java.util.Arrays;
 
             //Send action bar to players who are sleeping.
             new BukkitRunnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (player.isSleeping()) {
                         new BukkitRunnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 int sleepingPlayers = (int) Bukkit.getOnlinePlayers()
-                                                               .stream()
-                                                               .filter(p -> ((Player) p).isSleeping())
-                                                               .count();
+                                        .stream()
+                                        .filter(p -> ((Player) p).isSleeping())
+                                        .count();
                                 int onlinePlayers = Bukkit.getOnlinePlayers().size();
 
                                 UtilUI.sendActionBar(player, ChatColor.GRAY.toString() +
-                                                sleepingPlayers + "/" + onlinePlayers + " players in bed.");
+                                        sleepingPlayers + "/" + onlinePlayers + " players in bed.");
                             }
-                        }.runTask(SMP.getInstance());
+                        }.runTask(SMP.getINSTANCE());
                     } else
                         this.cancel();
                 }
-            }.runTaskTimerAsynchronously(SMP.getInstance(), 20L, 35L);
+            }.runTaskTimerAsynchronously(SMP.getINSTANCE(), 20L, 35L);
         }
     }
 
@@ -88,25 +100,28 @@ import java.util.Arrays;
         if (Arrays.stream(blacklistedWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
             event.setCancelled(true);
             new BukkitRunnable() {
-                @Override public void run() {
-                    recentlyBadPlayers.add(player);
+                @Override
+                public void run() {
+                    recentlyBadPlayers.add(player.getUniqueId());
                     UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "Racism Gay", "", 5, 70, 20);
 
                     for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 player.getWorld().strikeLightning(player.getLocation());
                             }
-                        }.runTaskLater(SMP.getInstance(), i * 3);
+                        }.runTaskLater(SMP.getINSTANCE(), i * 3);
                     }
 
                     new BukkitRunnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             recentlyBadPlayers.remove(player);
                         }
-                    }.runTaskLater(SMP.getInstance(), 20 * 20L);
+                    }.runTaskLater(SMP.getINSTANCE(), 20 * 20L);
                 }
-            }.runTask(SMP.getInstance());
+            }.runTask(SMP.getINSTANCE());
         }
 
         if (!event.isCancelled()) {
@@ -115,10 +130,11 @@ import java.util.Arrays;
                     onlinePlayer.sendMessage(event.getFormat().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.GRAY));
 
                     new BukkitRunnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                         }
-                    }.runTask(SMP.getInstance());
+                    }.runTask(SMP.getINSTANCE());
                 } else {
                     onlinePlayer.sendMessage(event.getFormat());
                 }
@@ -167,7 +183,7 @@ import java.util.Arrays;
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if (recentlyBadPlayers.contains(event.getEntity()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
+        if (recentlyBadPlayers.contains(event.getEntity().getUniqueId()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
             event.setDeathMessage(event.getEntity().getName() + " died of racism");
             recentlyBadPlayers.remove(event.getEntity());
         }
@@ -182,6 +198,11 @@ import java.util.Arrays;
 
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         Bukkit.broadcastMessage(UtilUI.colorize("&8[&a+&8] " + color + event.getPlayer().getName()));
+
+        influxDatabase.addPoint(Point.measurement("online_players")
+                .addField("online", Bukkit.getOnlinePlayers().size())
+                .build()
+        );
     }
 
     @EventHandler
@@ -193,5 +214,10 @@ import java.util.Arrays;
 
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         Bukkit.broadcastMessage(UtilUI.colorize("&8[&c-&8] &3" + color + event.getPlayer().getName()));
+
+        influxDatabase.addPoint(Point.measurement("online_players")
+                .addField("online", Bukkit.getOnlinePlayers().size() - 1)
+                .build()
+        );
     }
 }

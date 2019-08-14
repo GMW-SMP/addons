@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,8 +24,8 @@ public class PlayerManager {
     private final Gson GSON = new Gson();
 
     @Getter private static PlayerManager instance = new PlayerManager();
-    @Getter private ArrayList<GamePlayer> gamePlayers = new ArrayList<>();
-    @Getter private File dataDir = new File(SMP.getInstance().getDataFolder().getPath()+"/data");
+    @Getter private final List<GamePlayer> gamePlayers = new ArrayList<>();
+    @Getter private final File dataDir = new File(SMP.get().getDataFolder().getPath()+"/data");
 
     private PlayerManager() {
         if (!dataDir.exists()) {
@@ -99,7 +100,7 @@ public class PlayerManager {
             @Override public void run() {
                 UtilFile.writeAndCreate(player, getDataFile(player.getPlayer()));
             }
-        }.runTaskAsynchronously(SMP.getInstance());
+        }.runTaskAsynchronously(SMP.get());
     }
 
     private File getDataFile(Player player) {
