@@ -4,6 +4,7 @@ import cc.flogi.smp.SMP;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,18 +39,19 @@ public class BookGUI {
 //    }
 
     public void open(Player player) {
+        ItemStack previousItem = player.getInventory().getItemInMainHand();
+        player.getInventory().setItemInMainHand(book);
+
         ProtocolManager protocol = SMP.getInstance().getProtocolManager();
-
         PacketContainer bookPacket = protocol.createPacket(PacketType.Play.Server.OPEN_BOOK);
-
-        bookPacket.getItemModifier().write(0, book);
-        //Signing =  false;
-        bookPacket.getBooleans().write(0, false);
+        bookPacket.getHands().write(0, EnumWrappers.Hand.MAIN_HAND);
 
         try {
             protocol.sendServerPacket(player, bookPacket);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
+        } finally {
+            player.getInventory().setItemInMainHand(previousItem);
         }
     }
 }
