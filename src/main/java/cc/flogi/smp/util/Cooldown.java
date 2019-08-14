@@ -102,8 +102,8 @@ import java.text.MessageFormat;
     }
 
     public void start() {
-        task.runTaskLater(SMP.getInstance(), delay);
-        timerTask.runTaskTimer(SMP.getInstance(), 0L, 1L);
+        task.runTaskLater(SMP.get(), delay);
+        timerTask.runTaskTimer(SMP.get(), 0L, 1L);
     }
 
     public void cancel() {
