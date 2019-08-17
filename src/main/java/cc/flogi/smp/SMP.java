@@ -4,7 +4,6 @@ import cc.flogi.smp.command.BookmarkCommand;
 import cc.flogi.smp.command.SetColorCommand;
 import cc.flogi.smp.command.TitleBroadcastCommand;
 import cc.flogi.smp.database.InfluxDatabase;
-import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
@@ -28,19 +27,19 @@ public final class SMP extends JavaPlugin {
         INSTANCE = this;
 
         // Influx
-        influxDatabase = new InfluxDatabase(
-                "http://127.0.0.1:8086",
-                "smp",
-                "ilovetomine"
-        ).withDatabase(
-                "smp",
-                InfluxRetentionPolicy.builder()
-                        .name("defaultPolicy")
-                        .duration("30d")
-                        .replicationPolicy(1)
-                        .isDefault(true)
-                        .build()
-        );
+//        influxDatabase = new InfluxDatabase(
+//                "http://127.0.0.1:8086",
+//                "smp",
+//                "ilovetomine"
+//        ).withDatabase(
+//                "smp",
+//                InfluxRetentionPolicy.builder()
+//                        .name("defaultPolicy")
+//                        .duration("30d")
+//                        .replicationPolicy(1)
+//                        .isDefault(true)
+//                        .build()
+//        );
 
         //Events
         Bukkit.getPluginManager().registerEvents(new PlayerEvent(influxDatabase), this);

@@ -75,7 +75,7 @@ public class BookmarkCommand implements CommandExecutor {
                                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, directions));
 
                         //If the characters wrap to next line.
-                        if (cordsString.length() + mark.getName().length() > 19)
+                        if (cordsString.length() + mark.getName().length() > 22)
                             line++;
 
                         bookmarkIndex++;
