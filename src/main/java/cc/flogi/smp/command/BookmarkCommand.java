@@ -58,14 +58,17 @@ public class BookmarkCommand implements CommandExecutor {
 
                     if (bookmarkIndex < gp.getBookmarks().size()) {
                         Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
-
                         String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
                         Location loc = mark.getLocation();
-                        BaseComponent[] directions = new ComponentBuilder(UtilUI.colorize("&c'"+mark.getName()+"' is in a different world.")).create();
-                        if (loc.getWorld() == player.getWorld()) {
-                            String blockFace = UtilLocation.getRelativeDirection(player.getLocation(), loc).name().toLowerCase().replace('_', ' ');
-                            directions = new ComponentBuilder(UtilUI.colorize("&2~ " + (int) player.getLocation().distance(loc) + " blocks " + blockFace + ".")).create();
+
+                        if (!mark.getWorld().equalsIgnoreCase(player.getWorld().getName())) {
+                            bookmarkIndex++;
+                            line--;
+                            continue;
                         }
+
+                        String blockFace = UtilLocation.getRelativeDirection(player.getLocation(), loc).name().toLowerCase().replace('_', ' ');
+                        BaseComponent[] directions = new ComponentBuilder(UtilUI.colorize("&2~ " + (int) player.getLocation().distance(loc) + " blocks " + blockFace + ".")).create();
 
                         builder.color(ChatColor.GOLD)
                                 .append(mark.getName())
@@ -108,6 +111,12 @@ public class BookmarkCommand implements CommandExecutor {
                     if (bookmarkIndex < gp.getBookmarks().size()) {
                         Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
                         String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
+
+                        if (!mark.getWorld().equalsIgnoreCase(player.getWorld().getName())) {
+                            bookmarkIndex++;
+                            line--;
+                            continue;
+                        }
 
                         builder.color(ChatColor.GOLD)
                                 .append(mark.getName())
