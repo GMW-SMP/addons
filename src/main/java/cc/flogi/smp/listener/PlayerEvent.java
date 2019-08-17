@@ -185,7 +185,7 @@ public class PlayerEvent implements Listener {
         Player player = event.getEntity();
         GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
 
-        ChatColor color = gp.getNameColor() != null ? ChatColor.GRAY : gp.getNameColor();
+        ChatColor color = gp.getNameColor() == null ? ChatColor.GRAY : gp.getNameColor();
 
         if (recentlyBadPlayers.contains(player.getUniqueId()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
             event.setDeathMessage(color + player.getName() + ChatColor.RESET + " died of racism");
