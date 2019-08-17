@@ -83,9 +83,9 @@ import java.text.MessageFormat;
                     return;
                 }
 
-                double delaySeconds = delay/20;
+                double delaySeconds = delay / 20;
 
-                String progressBar = "&8| "+UtilUI.progressBar(10,  delaySeconds-seconds, delaySeconds, '-', ChatColor.GOLD, ChatColor.WHITE)+" &8|";
+                String progressBar = "&8| " + UtilUI.progressBar(10, delaySeconds - seconds, delaySeconds, '-', ChatColor.GOLD, ChatColor.WHITE) + " &8|";
                 String secondsString = seconds == 1 ? "second" : "seconds";
 
                 if (!isCancelled()) {

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
     private transient ArrayList<Cooldown> activeCountdowns = new ArrayList<>();
 
     //Serialized
+    @SerializedName("name") private String name;
+    @SerializedName("unique-id") private UUID uuid;
     @SerializedName("name-color") private String nameColor;
     @SerializedName("bookmarks") private List<Bookmark> bookmarks;
 
@@ -49,6 +52,7 @@ import java.util.stream.Collectors;
     public void addBookmark(Location location, String name) {
         getBookmarks().add(new Bookmark(
                 name,
+                location.getWorld().getName(),
                 location.getX(),
                 location.getY(),
                 location.getZ(),
@@ -74,11 +78,11 @@ import java.util.stream.Collectors;
         return bookmark != null;
     }
 
-    public void setNameColor(ChatColor nameColor) {
-        this.nameColor = nameColor.name();
-    }
-
     public ChatColor getNameColor() {
         return nameColor == null ? null : ChatColor.valueOf(nameColor);
+    }
+
+    public void setNameColor(ChatColor nameColor) {
+        this.nameColor = nameColor.name();
     }
 }

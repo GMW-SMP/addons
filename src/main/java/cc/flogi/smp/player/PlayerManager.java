@@ -21,11 +21,10 @@ import java.util.stream.Collectors;
  * Created on 2019-05-08
  */
 public class PlayerManager {
-    private final Gson GSON = new Gson();
-
     @Getter private static PlayerManager instance = new PlayerManager();
+    private final Gson GSON = new Gson();
     @Getter private final List<GamePlayer> gamePlayers = new ArrayList<>();
-    @Getter private final File dataDir = new File(SMP.get().getDataFolder().getPath()+"/data");
+    @Getter private final File dataDir = new File(SMP.get().getDataFolder().getPath() + "/data");
 
     private PlayerManager() {
         if (!dataDir.exists()) {
@@ -81,7 +80,7 @@ public class PlayerManager {
     }
 
     public GamePlayer loadFromFile(Player player) {
-        File dataFile = getDataFile(player);
+        File dataFile = getDataFile(player.getUniqueId());
         if (dataFile == null || dataFile.length() < 4) {
             return new GamePlayer(player);
         }
@@ -91,6 +90,7 @@ public class PlayerManager {
         GamePlayer gamePlayer = GSON.fromJson(serializedData, GamePlayer.class);
 
         gamePlayer.setPlayer(player);
+        gamePlayer.setName(player.getName());
         gamePlayer.setActiveCountdowns(new ArrayList<>());
         return gamePlayer;
     }
@@ -98,17 +98,17 @@ public class PlayerManager {
     public void saveToFile(GamePlayer player) {
         new BukkitRunnable() {
             @Override public void run() {
-                UtilFile.writeAndCreate(player, getDataFile(player.getPlayer()));
+                UtilFile.writeAndCreate(player, getDataFile(player.getUuid()));
             }
         }.runTaskAsynchronously(SMP.get());
     }
 
-    private File getDataFile(Player player) {
-        File dataFile = new File(dataDir.getAbsolutePath() + "/" + player.getUniqueId().toString() + ".json");
+    private File getDataFile(UUID uuid) {
+        File dataFile = new File(dataDir.getAbsolutePath() + "/" + uuid.toString() + ".json");
         if (!dataFile.exists()) {
             try {
                 if (!dataFile.createNewFile()) {
-                    throw new IOException("Failed to create data file for '" + player.getName() + "'.");
+                    throw new IOException("Failed to create data file for '" + uuid + "'.");
                 }
             } catch (IOException e) {
                 e.printStackTrace();

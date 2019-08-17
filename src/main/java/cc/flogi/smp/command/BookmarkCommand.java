@@ -4,10 +4,12 @@ import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.player.data.Bookmark;
 import cc.flogi.smp.util.BookGUI;
+import cc.flogi.smp.util.UtilLocation;
 import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -58,12 +60,16 @@ public class BookmarkCommand implements CommandExecutor {
                         Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
 
                         String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
+                        Location loc = new Location(player.getWorld(), mark.getX(), mark.getY(), mark.getZ(), mark.getYaw(), mark.getPitch());
+                        String blockFace = UtilLocation.getRelativeDirection(player.getLocation(), loc).name().toLowerCase().replace('_', ' ');
+                        String directions = UtilUI.colorize("&2~ " + (int) player.getLocation().distance(loc) + " blocks " + blockFace + ".");
 
                         builder.color(ChatColor.GOLD)
                                 .append(mark.getName())
                                 .append(UtilUI.colorize("&7&l|"))
                                 .append(cordsString)
-                                .color(ChatColor.GREEN);
+                                .color(ChatColor.GREEN)
+                                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(directions).create()));
 
                         //If the characters wrap to next line.
                         if (cordsString.length() + mark.getName().length() > 19)
@@ -98,7 +104,6 @@ public class BookmarkCommand implements CommandExecutor {
 
                     if (bookmarkIndex < gp.getBookmarks().size()) {
                         Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
-
                         String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
 
                         builder.color(ChatColor.GOLD)

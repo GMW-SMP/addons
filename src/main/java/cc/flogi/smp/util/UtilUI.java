@@ -50,12 +50,12 @@ public class UtilUI {
     /**
      * Generates a progress bar with ChatColors.
      *
-     * @param barSize The length of the progress bar.
-     * @param numerator The numerator of the fraction representing progress on the bar.
+     * @param barSize     The length of the progress bar.
+     * @param numerator   The numerator of the fraction representing progress on the bar.
      * @param denominator The denominator of the fraction representing progress on the bar.
-     * @param barChar The character the progress bar is made out of.
-     * @param used The color representing the used section of the bar.
-     * @param free The color representing the free section of the bar.
+     * @param barChar     The character the progress bar is made out of.
+     * @param used        The color representing the used section of the bar.
+     * @param free        The color representing the free section of the bar.
      * @return The generated progress bar.
      */
     public static String progressBar(int barSize, double numerator, double denominator, char barChar, ChatColor used, ChatColor free) {

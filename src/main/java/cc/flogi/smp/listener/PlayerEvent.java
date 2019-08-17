@@ -72,13 +72,13 @@ public class PlayerEvent implements Listener {
                             @Override
                             public void run() {
                                 int sleepingPlayers = (int) Bukkit.getOnlinePlayers()
-                                        .stream()
-                                        .filter(p -> ((Player) p).isSleeping())
-                                        .count();
+                                                                    .stream()
+                                                                    .filter(p -> ((Player) p).isSleeping())
+                                                                    .count();
                                 int onlinePlayers = Bukkit.getOnlinePlayers().size();
 
                                 UtilUI.sendActionBar(player, ChatColor.GRAY.toString() +
-                                        sleepingPlayers + "/" + onlinePlayers + " players in bed.");
+                                                                     sleepingPlayers + "/" + onlinePlayers + " players in bed.");
                             }
                         }.runTask(SMP.get());
                     } else
@@ -188,10 +188,10 @@ public class PlayerEvent implements Listener {
         ChatColor color = gp.getNameColor() != null ? ChatColor.GRAY : gp.getNameColor();
 
         if (recentlyBadPlayers.contains(player.getUniqueId()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
-            event.setDeathMessage(color+player.getName() + ChatColor.RESET + " died of racism");
+            event.setDeathMessage(color + player.getName() + ChatColor.RESET + " died of racism");
             recentlyBadPlayers.remove(player);
         } else {
-            event.getDeathMessage().replace(player.getName(), color+player.getName()+ChatColor.RESET);
+            event.setDeathMessage(event.getDeathMessage().replace(player.getName(), color + player.getName() + ChatColor.GRAY));
         }
     }
 
@@ -206,11 +206,11 @@ public class PlayerEvent implements Listener {
         Bukkit.broadcastMessage(UtilUI.colorize("&8[&a+&8] " + color + event.getPlayer().getName()));
 
         String mcVer = Bukkit.getVersion();
-        mcVer = mcVer.substring(mcVer.indexOf(":")+2, mcVer.indexOf(")"));
+        mcVer = mcVer.substring(mcVer.indexOf(":") + 2, mcVer.indexOf(")"));
         String smpVer = SMP.get().getDescription().getVersion();
 
         event.getPlayer().setPlayerListHeader(UtilUI.colorize("&a&lSMP\n&7You're playing on smp.flogi.cc."));
-        event.getPlayer().setPlayerListFooter(UtilUI.colorize("&8MC "+mcVer+" | SMP "+smpVer));
+        event.getPlayer().setPlayerListFooter(UtilUI.colorize("&8MC " + mcVer + " | SMP " + smpVer));
 
 //        influxDatabase.addPoint(Point.measurement("online_players")
 //                .addField("online", Bukkit.getOnlinePlayers().size())

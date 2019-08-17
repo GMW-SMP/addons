@@ -1,7 +1,7 @@
 package cc.flogi.smp.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 
 /**
  * @author Caden Kriese (flogic)
@@ -9,17 +9,19 @@ import java.util.Map;
  * Created on 2019-08-07
  */
 public class UtilLocation {
-    public static Map<String, Object> convertMap(Map<?, ?> location) {
-        Map<String, Object> convertedLocation = new HashMap<>();
+    private static final BlockFace[] RADIAL = {BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST};
 
-        if (!location.isEmpty()) {
-            for (Map.Entry<?, ?> entry : location.entrySet()) {
-                if (entry.getKey() instanceof String) {
-                    convertedLocation.put((String) entry.getKey(), entry.getValue());
-                }
-            }
-        }
+    /**
+     * Gets the direction of one block relative to another.
+     *
+     * @param locA The base location.
+     * @param locB The relative location.
+     * @return The block face of locB relative to locA.
+     */
+    public static BlockFace getRelativeDirection(Location locA, Location locB) {
+        locA.setDirection(locB.toVector().subtract(locA.toVector()));
+        float yaw = locA.getYaw();
 
-        return convertedLocation;
+        return RADIAL[Math.round(yaw / 90f) & 0x3];
     }
 }
