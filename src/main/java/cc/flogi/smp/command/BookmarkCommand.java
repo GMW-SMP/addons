@@ -140,6 +140,7 @@ public class BookmarkCommand implements CommandExecutor {
             if (args.length > 1) {
                 String name = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), ' ');
                 if (gp.removeBookmark(name)) {
+                    PlayerManager.getInstance().saveToFile(gp);
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                     player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Successfully removed bookmark &f'" + name + "'&7."));
                 } else {
