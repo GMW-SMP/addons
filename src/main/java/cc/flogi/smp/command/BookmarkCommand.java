@@ -60,19 +60,22 @@ public class BookmarkCommand implements CommandExecutor {
                         Bookmark mark = gp.getBookmarks().get(bookmarkIndex);
 
                         String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
-                        Location loc = new Location(player.getWorld(), mark.getX(), mark.getY(), mark.getZ(), mark.getYaw(), mark.getPitch());
-                        String blockFace = UtilLocation.getRelativeDirection(player.getLocation(), loc).name().toLowerCase().replace('_', ' ');
-                        String directions = UtilUI.colorize("&2~ " + (int) player.getLocation().distance(loc) + " blocks " + blockFace + ".");
+                        Location loc = mark.getLocation();
+                        BaseComponent[] directions = new ComponentBuilder(UtilUI.colorize("&c'"+mark.getName()+"' is in a different world.")).create();
+                        if (loc.getWorld() == player.getWorld()) {
+                            String blockFace = UtilLocation.getRelativeDirection(player.getLocation(), loc).name().toLowerCase().replace('_', ' ');
+                            directions = new ComponentBuilder(UtilUI.colorize("&2~ " + (int) player.getLocation().distance(loc) + " blocks " + blockFace + ".")).create();
+                        }
 
                         builder.color(ChatColor.GOLD)
                                 .append(mark.getName())
                                 .append(UtilUI.colorize("&7&l|"))
                                 .append(cordsString)
                                 .color(ChatColor.GREEN)
-                                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(directions).create()));
+                                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, directions));
 
                         //If the characters wrap to next line.
-                        if (cordsString.length() + mark.getName().length() > 19)
+                        if (cordsString.length() + mark.getName().length() > 22)
                             line++;
 
                         bookmarkIndex++;

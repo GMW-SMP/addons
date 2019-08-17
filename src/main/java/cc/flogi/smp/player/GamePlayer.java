@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 
     GamePlayer(Player player) {
         this.player = player;
+        this.uuid = player.getUniqueId();
+        this.name = player.getName();
     }
 
     public void interruptCooldowns(String message) {
