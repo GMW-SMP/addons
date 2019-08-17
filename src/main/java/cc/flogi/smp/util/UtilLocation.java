@@ -9,7 +9,7 @@ import org.bukkit.block.BlockFace;
  * Created on 2019-08-07
  */
 public class UtilLocation {
-    private static final BlockFace[] RADIAL = {BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST};
+    private static final BlockFace[] RADIAL = {BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST};
 
     /**
      * Gets the direction of one block relative to another.
@@ -22,6 +22,6 @@ public class UtilLocation {
         locA.setDirection(locB.toVector().subtract(locA.toVector()));
         float yaw = locA.getYaw();
 
-        return RADIAL[Math.round(yaw / 90f) & 0x3];
+        return RADIAL[Math.round(yaw / 45f) & 0x7];
     }
 }
