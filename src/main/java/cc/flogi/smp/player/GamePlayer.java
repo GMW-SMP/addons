@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
     //Runtime
     private transient Player player;
     private transient boolean recentlyBad;
+    private transient UUID lastMessaged;
     private transient ArrayList<Cooldown> activeCountdowns = new ArrayList<>();
 
     //Serialized
@@ -81,7 +82,7 @@ import java.util.stream.Collectors;
     }
 
     public ChatColor getNameColor() {
-        return nameColor == null ? null : ChatColor.valueOf(nameColor);
+        return nameColor == null ? ChatColor.GRAY : ChatColor.valueOf(nameColor);
     }
 
     public void setNameColor(ChatColor nameColor) {

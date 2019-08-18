@@ -8,6 +8,7 @@ authors: [flogic]
 depend: [ProtocolLib]
 commands:
   setcolor:
+    aliases: sc
     description: Sets the color of your name in chat.
   titlebroadcast:
     aliases: tbc
@@ -18,3 +19,9 @@ commands:
   bookmarks:
     aliases: marks
     description: Displays your bookmarks.
+  message:
+    aliases: [tell, t, msg, pm]
+    description: Sends a private message to a player.
+  reply:
+    aliases: r
+    description: Send a response to your last message.

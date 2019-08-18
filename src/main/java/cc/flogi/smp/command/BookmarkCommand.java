@@ -158,17 +158,24 @@ public class BookmarkCommand implements CommandExecutor {
                 }
 
                 player.performCommand("bookmark edit");
-            } else
+            } else {
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
                 player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Please enter a bookmark to remove."));
+            }
             return true;
         }
 
         String name = StringUtils.join(args, ' ');
-        gp.addBookmark((player).getLocation(), name);
-        PlayerManager.getInstance().saveToFile(gp);
+        if (gp.getBookmarks().stream().map(Bookmark::getName).noneMatch(name::equalsIgnoreCase)) {
+            gp.addBookmark((player).getLocation(), name);
+            PlayerManager.getInstance().saveToFile(gp);
 
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-        player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Added location to your bookmarks."));
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Added location to your bookmarks."));
+        } else {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+            player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You already have a bookmark with that name."));
+        }
 
         return true;
     }
