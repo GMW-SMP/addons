@@ -1,6 +1,7 @@
 package cc.flogi.smp;
 
 import cc.flogi.smp.command.BookmarkCommand;
+import cc.flogi.smp.command.MessageCommand;
 import cc.flogi.smp.command.SetColorCommand;
 import cc.flogi.smp.command.TitleBroadcastCommand;
 import cc.flogi.smp.database.InfluxDatabase;
@@ -13,6 +14,9 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 @SuppressWarnings("ConstantConditions")
 public final class SMP extends JavaPlugin {
@@ -46,13 +50,18 @@ public final class SMP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
-        getCommand("setcolor").setExecutor(new SetColorCommand());
-        getCommand("titlebroadcast").setExecutor(new TitleBroadcastCommand());
-        getCommand("tbc").setExecutor(new TitleBroadcastCommand());
-        getCommand("bookmark").setExecutor(new BookmarkCommand());
-        getCommand("bm").setExecutor(new BookmarkCommand());
-        getCommand("bookmarks").setExecutor(new BookmarkCommand());
-        getCommand("marks").setExecutor(new BookmarkCommand());
+        Stream.of("setcolor", "sc")
+                .map(this::getCommand)
+                .forEach(cmd -> cmd.setExecutor(new SetColorCommand()));
+        Stream.of("titlebroadcast", "tbc")
+                .map(this::getCommand)
+                .forEach(cmd -> cmd.setExecutor(new TitleBroadcastCommand()));
+        Stream.of("marks", "bookmarks", "bm", "bookmark")
+                .map(this::getCommand)
+                .forEach(cmd -> cmd.setExecutor(new BookmarkCommand()));
+        Stream.of("message", "tell", "t", "msg", "pm", "reply", "r")
+                .map(this::getCommand)
+                .forEach(cmd -> cmd.setExecutor(new MessageCommand()));
 
         //Classes
         protocolManager = ProtocolLibrary.getProtocolManager();

@@ -52,10 +52,8 @@ public class PlayerEvent implements Listener {
                 UtilUI.sendActionBar(player, "Bed spawn location set.");
             }
 
-            ChatColor nameColor = gp.getNameColor() == null ? ChatColor.GRAY : gp.getNameColor();
-
             Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1));
-            Bukkit.broadcastMessage(nameColor + player.getName() + ChatColor.GRAY + " has entered a bed.");
+            Bukkit.broadcastMessage(gp.getNameColor() + player.getName() + ChatColor.GRAY + " has entered a bed.");
 
             ArrayList<Player> otherPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
             otherPlayers.remove(player);
@@ -139,8 +137,8 @@ public class PlayerEvent implements Listener {
                 }
             }
 
-            Bukkit.getConsoleSender().sendMessage(event.getFormat());
-            event.setCancelled(true);
+            //Better than doing setCancelled as it allows other plugins to handle the event.
+            event.getRecipients().clear();
         }
     }
 
@@ -185,13 +183,11 @@ public class PlayerEvent implements Listener {
         Player player = event.getEntity();
         GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
 
-        ChatColor color = gp.getNameColor() != null ? ChatColor.GRAY : gp.getNameColor();
-
         if (recentlyBadPlayers.contains(player.getUniqueId()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
-            event.setDeathMessage(color + player.getName() + ChatColor.RESET + " died of racism");
+            event.setDeathMessage(gp.getNameColor() + player.getName() + ChatColor.RESET + " died of racism");
             recentlyBadPlayers.remove(player);
         } else {
-            event.setDeathMessage(event.getDeathMessage().replace(player.getName(), color + player.getName() + ChatColor.GRAY));
+            event.setDeathMessage(event.getDeathMessage().replace(player.getName(), gp.getNameColor() + player.getName() + ChatColor.GRAY));
         }
     }
 
