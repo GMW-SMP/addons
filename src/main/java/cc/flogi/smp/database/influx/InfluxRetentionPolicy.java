@@ -9,7 +9,6 @@ import lombok.Data;
 @Builder
 @Data
 public class InfluxRetentionPolicy {
-
     private String name;
     private String database;
     private String duration;

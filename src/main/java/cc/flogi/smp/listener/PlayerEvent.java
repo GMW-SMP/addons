@@ -1,7 +1,6 @@
 package cc.flogi.smp.listener;
 
 import cc.flogi.smp.SMP;
-import cc.flogi.smp.database.InfluxDatabase;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilUI;
@@ -30,15 +29,8 @@ import java.util.*;
 @SuppressWarnings("ALL")
 public class PlayerEvent implements Listener {
 
-    // Influx
-    private final InfluxDatabase influxDatabase;
-
     private final String[] blacklistedWords = new String[]{"nigga", "nigger", "neegar", "kneegar"};
     private final Set<UUID> recentlyBadPlayers = new HashSet<>();
-
-    public PlayerEvent(InfluxDatabase influxDatabase) {
-        this.influxDatabase = influxDatabase;
-    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -207,11 +199,6 @@ public class PlayerEvent implements Listener {
 
         event.getPlayer().setPlayerListHeader(UtilUI.colorize("&a&lSMP\n&7You're playing on smp.flogi.cc."));
         event.getPlayer().setPlayerListFooter(UtilUI.colorize("&8MC " + mcVer + " | SMP " + smpVer));
-
-//        influxDatabase.addPoint(Point.measurement("online_players")
-//                .addField("online", Bukkit.getOnlinePlayers().size())
-//                .build()
-//        );
     }
 
     @EventHandler
@@ -223,10 +210,5 @@ public class PlayerEvent implements Listener {
 
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         Bukkit.broadcastMessage(UtilUI.colorize("&8[&c-&8] &3" + color + event.getPlayer().getName()));
-
-//        influxDatabase.addPoint(Point.measurement("online_players")
-//                .addField("online", Bukkit.getOnlinePlayers().size() - 1)
-//                .build()
-//        );
     }
 }

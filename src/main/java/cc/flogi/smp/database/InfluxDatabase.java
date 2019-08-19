@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class InfluxDatabase {
 
     private final InfluxDB DB;
+    private String retentionPolicy;
 
     public InfluxDatabase(String host, String username, String password) {
         DB = InfluxDBFactory.connect(host, username, password);
@@ -29,6 +30,8 @@ public class InfluxDatabase {
             return this;
         }
 
+        retentionPolicy = policy.getName();
+
         DB.createDatabase(name);
         DB.createRetentionPolicy(
                 policy.getName(),
@@ -45,6 +48,6 @@ public class InfluxDatabase {
     }
 
     public void addPoint(Point point) {
-        DB.write(point);
+        DB.write("smp", retentionPolicy, point);
     }
 }
