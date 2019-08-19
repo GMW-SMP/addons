@@ -4,6 +4,8 @@ import cc.flogi.smp.command.BookmarkCommand;
 import cc.flogi.smp.command.MessageCommand;
 import cc.flogi.smp.command.SetColorCommand;
 import cc.flogi.smp.command.TitleBroadcastCommand;
+import cc.flogi.smp.database.InfluxDatabase;
+import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
@@ -14,8 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
 import java.util.stream.Stream;
@@ -25,7 +25,7 @@ public final class SMP extends JavaPlugin {
     private static SMP INSTANCE;
 
     @Getter private ProtocolManager protocolManager;
-    @Getter private InfluxDB influxDatabase;
+    @Getter private InfluxDatabase influxDatabase;
 
     @Override
     public void onEnable() {
@@ -54,16 +54,26 @@ public final class SMP extends JavaPlugin {
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
 
         // Influx
-        influxDatabase = InfluxDBFactory.connect("http://localhost:8086", "smp", "ilovetomine");
-        if (influxDatabase != null) {
-            influxDatabase.createDatabase("smp");
-            influxDatabase.createRetentionPolicy("defaultPolicy", "smp", "30d", 1, true);
+        influxDatabase = new InfluxDatabase(
+                "http://127.0.0.1:8086",
+                "smp",
+                "ilovetomine"
+        ).withDatabase(
+                "smp",
+                InfluxRetentionPolicy.builder()
+                        .name("defaultPolicy")
+                        .duration("30d")
+                        .replicationPolicy(1)
+                        .isDefault(true)
+                        .build()
+        );
 
+        if (influxDatabase != null) {
             new BukkitRunnable() {
                 @Override public void run() {
-                    influxDatabase.write("smp", "defaultPolicy", Point.measurement("online_players")
-                                                                         .addField("online", Bukkit.getOnlinePlayers().size())
-                                                                         .build()
+                    influxDatabase.addPoint(Point.measurement("online_players")
+                                                    .addField("online", Bukkit.getOnlinePlayers().size())
+                                                    .build()
                     );
                 }
             }.runTaskTimerAsynchronously(INSTANCE, 100, 100);
