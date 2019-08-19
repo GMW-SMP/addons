@@ -32,7 +32,7 @@ public final class SMP extends JavaPlugin {
         INSTANCE = this;
 
         //Events
-        Bukkit.getPluginManager().registerEvents(new PlayerEvent(influxDatabase), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerEvent(), this);
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
@@ -52,7 +52,6 @@ public final class SMP extends JavaPlugin {
         //Classes
         protocolManager = ProtocolLibrary.getProtocolManager();
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
-
 
         // Influx
         influxDatabase = InfluxDBFactory.connect("http://localhost:8086", "smp", "ilovetomine");

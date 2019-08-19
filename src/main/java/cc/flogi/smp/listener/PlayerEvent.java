@@ -18,8 +18,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.influxdb.InfluxDB;
-import org.influxdb.dto.Point;
 
 import java.util.*;
 
@@ -31,15 +29,8 @@ import java.util.*;
 @SuppressWarnings("ALL")
 public class PlayerEvent implements Listener {
 
-    // Influx
-    private final InfluxDB influxDatabase;
-
     private final String[] blacklistedWords = new String[]{"nigga", "nigger", "neegar", "kneegar"};
     private final Set<UUID> recentlyBadPlayers = new HashSet<>();
-
-    public PlayerEvent(InfluxDB influxDatabase) {
-        this.influxDatabase = influxDatabase;
-    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
