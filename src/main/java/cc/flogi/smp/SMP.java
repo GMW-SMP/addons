@@ -71,12 +71,22 @@ public final class SMP extends JavaPlugin {
         if (influxDatabase != null) {
             new BukkitRunnable() {
                 @Override public void run() {
-                    influxDatabase.addPoint(Point.measurement("online_players")
-                                                    .addField("online", Bukkit.getOnlinePlayers().size())
+                    int loadedChunks = Bukkit.getWorlds().stream().mapToInt(world -> world.getLoadedChunks().length).sum();
+
+                    influxDatabase.addPoint(Point.measurement("server_stats")
+                                                    .addField("online_players", Bukkit.getOnlinePlayers().size())
+                                                    .build()
+                    );
+                    influxDatabase.addPoint(Point.measurement("server_stats")
+                                                    .addField("tps", Bukkit.getTPS()[0])
+                                                    .build()
+                    );
+                    influxDatabase.addPoint(Point.measurement("server_stats")
+                                                    .addField("loaded_chunks", loadedChunks)
                                                     .build()
                     );
                 }
-            }.runTaskTimerAsynchronously(INSTANCE, 100, 100);
+            }.runTaskTimerAsynchronously(INSTANCE, 150, 150);
         } else {
             getLogger().warning("INFLUX DATABASE CONNECTION FAILED, NO STATISTICS WILL BE WRITTEN.");
         }
