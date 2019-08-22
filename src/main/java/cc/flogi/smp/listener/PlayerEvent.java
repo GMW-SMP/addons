@@ -20,6 +20,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author Caden Kriese (flogic)
@@ -29,8 +30,15 @@ import java.util.*;
 @SuppressWarnings("ALL")
 public class PlayerEvent implements Listener {
 
-    private final String[] blacklistedWords = new String[]{"nigga", "nigger", "neegar", "kneegar"};
     private final Set<UUID> recentlyBadPlayers = new HashSet<>();
+    private final Pattern[] blacklistedPatterns = new Pattern[]{
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*g+(\\W|\\d|_)*(a|4)+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*g+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*(i|4)+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*l+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*t+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*)")
+    };
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -86,13 +94,14 @@ public class PlayerEvent implements Listener {
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         event.setFormat(UtilUI.colorize(color + player.getName() + "&8: &7" + event.getMessage()));
 
-        if (Arrays.stream(blacklistedWords).anyMatch(word -> event.getMessage().toLowerCase().contains(word))) {
+        if (Arrays.stream(blacklistedPatterns).anyMatch(pat -> pat.matcher(event.getMessage().toLowerCase()).find())) {
             event.setCancelled(true);
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     recentlyBadPlayers.add(player.getUniqueId());
                     UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "Racism Gay", "", 5, 70, 20);
+                    SMP.get().getLogger().info(player.getName()+" tried to say a blacklisted phrase.");
 
                     for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
@@ -162,7 +171,7 @@ public class PlayerEvent implements Listener {
     public void onMove(PlayerMoveEvent event) {
         //Clone to avoid modifying the from location.
         Location diff = event.getFrom().clone().subtract(event.getTo());
-        if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockY()) == 1 || Math.abs(diff.getBlockZ()) == 1) {
+        if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockZ()) == 1 || Math.abs(diff.getBlockY()) == 1) {
             if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
                 GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
                 gamePlayer.interruptCooldowns("Movement detected.");
@@ -185,12 +194,12 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        PlayerManager.getInstance().addPlayers(event.getPlayer());
-        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
-
         event.setJoinMessage("");
 
-        String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
+        PlayerManager.getInstance().addPlayers(event.getPlayer());
+
+        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        ChatColor color = gamePlayer.getNameColor();
         Bukkit.broadcastMessage(UtilUI.colorize("&8[&a+&8] " + color + event.getPlayer().getName()));
 
         String mcVer = Bukkit.getVersion();
@@ -203,12 +212,12 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        PlayerManager.getInstance().playerLogout(event.getPlayer());
-        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
-
         event.setQuitMessage("");
 
-        String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
+        PlayerManager.getInstance().playerLogout(event.getPlayer());
+
+        GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        ChatColor color = gamePlayer.getNameColor();
         Bukkit.broadcastMessage(UtilUI.colorize("&8[&c-&8] &3" + color + event.getPlayer().getName()));
     }
 }
