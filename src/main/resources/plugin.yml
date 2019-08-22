@@ -25,3 +25,5 @@ commands:
   reply:
     aliases: r
     description: Send a response to your last message.
+  smpwhitelist:
+    description: A specific command that only allows adding people to the whitelist, not removing.

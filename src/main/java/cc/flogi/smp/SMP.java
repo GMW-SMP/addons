@@ -1,9 +1,6 @@
 package cc.flogi.smp;
 
-import cc.flogi.smp.command.BookmarkCommand;
-import cc.flogi.smp.command.MessageCommand;
-import cc.flogi.smp.command.SetColorCommand;
-import cc.flogi.smp.command.TitleBroadcastCommand;
+import cc.flogi.smp.command.*;
 import cc.flogi.smp.database.InfluxDatabase;
 import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
@@ -18,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.influxdb.dto.Point;
 
-import java.net.ConnectException;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"ConstantConditions", "FieldCanBeLocal"})
@@ -50,6 +46,9 @@ public final class SMP extends JavaPlugin {
         Stream.of("message", "tell", "t", "msg", "pm", "reply", "r")
                 .map(this::getCommand)
                 .forEach(cmd -> cmd.setExecutor(new MessageCommand()));
+        Stream.of("smpwhitelist")
+                .map(this::getCommand)
+                .forEach(cmd -> cmd.setExecutor(new SMPWhitelistCommand()));
 
         //Classes
         protocolManager = ProtocolLibrary.getProtocolManager();
