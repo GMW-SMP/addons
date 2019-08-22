@@ -1,9 +1,6 @@
 package cc.flogi.smp;
 
-import cc.flogi.smp.command.BookmarkCommand;
-import cc.flogi.smp.command.MessageCommand;
-import cc.flogi.smp.command.SetColorCommand;
-import cc.flogi.smp.command.TitleBroadcastCommand;
+import cc.flogi.smp.command.*;
 import cc.flogi.smp.database.InfluxDatabase;
 import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
@@ -20,15 +17,16 @@ import org.influxdb.dto.Point;
 
 import java.util.stream.Stream;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "FieldCanBeLocal"})
 public final class SMP extends JavaPlugin {
     private static SMP INSTANCE;
 
     @Getter private ProtocolManager protocolManager;
     @Getter private InfluxDatabase influxDatabase;
 
-    @Override
-    public void onEnable() {
+    private final long STAT_PUSH_INTERVAL = 150;
+
+    @Override public void onEnable() {
         INSTANCE = this;
 
         //Events
@@ -48,25 +46,33 @@ public final class SMP extends JavaPlugin {
         Stream.of("message", "tell", "t", "msg", "pm", "reply", "r")
                 .map(this::getCommand)
                 .forEach(cmd -> cmd.setExecutor(new MessageCommand()));
+        Stream.of("smpwhitelist")
+                .map(this::getCommand)
+                .forEach(cmd -> cmd.setExecutor(new SMPWhitelistCommand()));
 
         //Classes
         protocolManager = ProtocolLibrary.getProtocolManager();
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
 
         // Influx
-        influxDatabase = new InfluxDatabase(
-                "http://127.0.0.1:8086",
-                "smp",
-                "ilovetomine"
-        ).withDatabase(
-                "smp",
-                InfluxRetentionPolicy.builder()
-                        .name("defaultPolicy")
-                        .duration("30d")
-                        .replicationPolicy(1)
-                        .isDefault(true)
-                        .build()
-        );
+        try {
+            influxDatabase = new InfluxDatabase(
+                    "http://localhost:8086",
+                    "smp",
+                    "ilovetomine"
+            ).withDatabase(
+                    "smp",
+                    InfluxRetentionPolicy.builder()
+                            .name("defaultPolicy")
+                            .duration("30d")
+                            .replicationPolicy(1)
+                            .isDefault(true)
+                            .build()
+            );
+        } catch (Exception ex) {
+            influxDatabase = null;
+            getLogger().warning("Connection to InfluxDB failed. ("+ex.getMessage()+")");
+        }
 
         if (influxDatabase != null) {
             new BukkitRunnable() {
@@ -86,7 +92,7 @@ public final class SMP extends JavaPlugin {
                                                     .build()
                     );
                 }
-            }.runTaskTimerAsynchronously(INSTANCE, 150, 150);
+            }.runTaskTimerAsynchronously(INSTANCE, STAT_PUSH_INTERVAL, STAT_PUSH_INTERVAL);
         } else {
             getLogger().warning("INFLUX DATABASE CONNECTION FAILED, NO STATISTICS WILL BE WRITTEN.");
         }
