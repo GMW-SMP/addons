@@ -94,7 +94,9 @@ public class PlayerEvent implements Listener {
         String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
         event.setFormat(UtilUI.colorize(color + player.getName() + "&8: &7" + event.getMessage()));
 
-        if (Arrays.stream(blacklistedPatterns).anyMatch(pat -> pat.matcher(event.getMessage().toLowerCase()).find())) {
+        String strippedMessage = ChatColor.stripColor(UtilUI.colorize(event.getMessage())).toLowerCase();
+
+        if (Arrays.stream(blacklistedPatterns).anyMatch(pat -> pat.matcher(strippedMessage).find())) {
             event.setCancelled(true);
             new BukkitRunnable() {
                 @Override
