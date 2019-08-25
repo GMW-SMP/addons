@@ -6,6 +6,7 @@ import cc.flogi.smp.util.UtilUI;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 @Data public class GamePlayer {
 
     //Runtime
-    private transient Player player;
     private transient boolean recentlyBad;
     private transient UUID lastMessaged;
     private transient ArrayList<Cooldown> activeCountdowns = new ArrayList<>();
@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
     @SerializedName("bookmarks") private List<Bookmark> bookmarks;
 
     GamePlayer(Player player) {
-        this.player = player;
         this.uuid = player.getUniqueId();
         this.name = player.getName();
     }
@@ -49,7 +48,7 @@ import java.util.stream.Collectors;
         activeCountdowns.removeAll(cooldownsFiltered);
 
         if (cooldownsFiltered.size() > 0)
-            UtilUI.sendActionBar(player, "&4&lCANCELLED &8- &7" + message);
+            UtilUI.sendActionBar(getPlayer(), "&4&lCANCELLED &8- &7" + message);
     }
 
     public void addBookmark(Location location, String name) {
@@ -87,5 +86,9 @@ import java.util.stream.Collectors;
 
     public void setNameColor(ChatColor nameColor) {
         this.nameColor = nameColor.name();
+    }
+
+    public Player getPlayer() {
+        return Bukkit.getPlayer(uuid);
     }
 }

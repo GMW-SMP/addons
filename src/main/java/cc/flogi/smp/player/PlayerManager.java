@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  */
 public class PlayerManager {
     @Getter private static PlayerManager instance = new PlayerManager();
+
     private final Gson GSON = new Gson();
     @Getter private final List<GamePlayer> gamePlayers = new ArrayList<>();
     @Getter private final File dataDir = new File(SMP.get().getDataFolder().getPath() + "/data");
@@ -55,19 +56,37 @@ public class PlayerManager {
      * @return The ${@link GamePlayer} object of the given player.
      */
     public GamePlayer getGamePlayer(UUID uuid) {
-        return gamePlayers.stream()
-                       .filter(gp -> gp.getPlayer().getUniqueId().equals(uuid))
-                       .findFirst().orElse(null);
+        for (GamePlayer player : gamePlayers) {
+            if (player.getUuid().equals(uuid))
+                return player;
+        }
+
+        return null;
     }
 
+    /**
+     * Performs log out tasks for a player, such as, writing data and closing their object.
+     *
+     * @param players The players to remove.
+     */
     public void addPlayers(Player... players) {
         gamePlayers.addAll(Arrays.stream(players).map(this::loadFromFile).collect(Collectors.toList()));
     }
 
-    public void removePlayers(Player... players) {
+    /**
+     * Performs log out tasks for a player, such as, writing data and closing their object.
+     *
+     * @param players The players to remove.
+     */
+    private void removePlayers(Player... players) {
         gamePlayers.removeAll(Arrays.stream(players).map(this::getGamePlayer).collect(Collectors.toList()));
     }
 
+    /**
+     * Performs log out tasks for a player, such as, writing data and closing their object.
+     *
+     * @param player The player that is logging out.
+     */
     public void playerLogout(Player player) {
         new BukkitRunnable() {
             @Override public void run() {
@@ -79,7 +98,14 @@ public class PlayerManager {
         };
     }
 
-    public GamePlayer loadFromFile(Player player) {
+    /**
+     * Loads a GamePlayer from a stored data file.
+     * The file will be created if one isn't found.
+     *
+     * @param player The player to search for.
+     * @return The {@link GamePlayer} object of the given player.
+     */
+    private GamePlayer loadFromFile(Player player) {
         File dataFile = getDataFile(player.getUniqueId());
         if (dataFile == null || dataFile.length() < 4) {
             return new GamePlayer(player);
@@ -89,12 +115,16 @@ public class PlayerManager {
 
         GamePlayer gamePlayer = GSON.fromJson(serializedData, GamePlayer.class);
 
-        gamePlayer.setPlayer(player);
         gamePlayer.setName(player.getName());
         gamePlayer.setActiveCountdowns(new ArrayList<>());
         return gamePlayer;
     }
 
+    /**
+     * Saves a players data to a flatfile (asynchronously).
+     *
+     * @param player The player who's data should be saved.
+     */
     public void saveToFile(GamePlayer player) {
         new BukkitRunnable() {
             @Override public void run() {
