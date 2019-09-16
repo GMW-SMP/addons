@@ -24,7 +24,7 @@ import java.util.stream.Stream;
   @since 5/8/2019
  *
  * Copyright © 2019 Caden "flogic" Kriese
- * This code is not to be redestributed or modified in any way internally or commercially.
+ * This code is not to be redistributed or modified in any way internally or commercially.
  */
 @SuppressWarnings({"ConstantConditions", "FieldCanBeLocal"})
 public final class SMP extends JavaPlugin {
@@ -43,7 +43,7 @@ public final class SMP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
-        Stream.of("setcolor", "sc")
+        Stream.of("setcolor", "setcolour", "sc")
                 .map(this::getCommand)
                 .forEach(cmd -> cmd.setExecutor(new SetColorCommand()));
         Stream.of("titlebroadcast", "tbc")

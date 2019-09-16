@@ -1,6 +1,7 @@
 package cc.flogi.smp.listener;
 
 import cc.flogi.smp.SMP;
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilUI;
@@ -8,6 +9,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -90,10 +92,6 @@ public class PlayerEvent implements Listener {
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
-
-        String color = gamePlayer.getNameColor() == null ? "&7" : gamePlayer.getNameColor().toString();
-        event.setFormat(UtilUI.colorize(color + player.getName() + "&8: &7" + event.getMessage()));
-
         String strippedMessage = ChatColor.stripColor(UtilUI.colorize(event.getMessage())).toLowerCase();
 
         if (Arrays.stream(blacklistedPatterns).anyMatch(pat -> pat.matcher(strippedMessage).find())) {
@@ -125,9 +123,23 @@ public class PlayerEvent implements Listener {
         }
 
         if (!event.isCancelled()) {
+            String deaths = String.valueOf(player.getStatistic(Statistic.DEATHS));
+            String mobKills = String.valueOf(player.getStatistic(Statistic.MOB_KILLS));
+            String distanceTraveled = String.format("%.2f", (double) Arrays.stream(Statistic.values())
+                                              .filter(stat -> stat.name().contains("ONE_CM"))
+                                              .map(stat -> player.getStatistic(stat))
+                                              .mapToInt(Integer::intValue)
+                                              .sum()/100000d)+"km";
+
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {
-                    onlinePlayer.sendMessage(event.getFormat().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.GRAY));
+                    I18n.sendMessage(onlinePlayer, "chat_format", false,
+                            "name", player.getName(),
+                            "color", gamePlayer.getNameColor().toString(),
+                            "message", event.getMessage().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.GRAY),
+                            "deaths", deaths,
+                            "mobs_killed", mobKills,
+                            "distance_traveled", distanceTraveled);
 
                     new BukkitRunnable() {
                         @Override
@@ -136,10 +148,18 @@ public class PlayerEvent implements Listener {
                         }
                     }.runTask(SMP.get());
                 } else {
-                    onlinePlayer.sendMessage(event.getFormat());
+                    I18n.sendMessage(onlinePlayer, "chat_format", false,
+                            "name", player.getName(),
+                            "color", gamePlayer.getNameColor().toString(),
+                            "message", event.getMessage(),
+                            "deaths", deaths,
+                            "mobs_killed", mobKills,
+                            "distance_traveled", distanceTraveled);
                 }
             }
 
+            //Format for console.
+            event.setFormat(UtilUI.colorize(gamePlayer.getNameColor() + player.getName() + "&8: &7" + event.getMessage()));
             //Better than doing setCancelled as it allows other plugins to handle the event.
             event.getRecipients().clear();
         }

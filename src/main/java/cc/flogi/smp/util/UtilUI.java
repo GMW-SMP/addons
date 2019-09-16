@@ -103,6 +103,24 @@ public class UtilUI {
     }
 
     /**
+     * Utility for formatting strings with variables.
+     * The given strings are split into key/value pairs.
+     *
+     * @param toFormat The string to format with the variables.
+     * @param variables The variables to format the string with,
+     * @return The string with the variables replaced.
+     */
+    public static String format(String toFormat, String... variables) {
+        for (int i = 0; i < variables.length; i += 2) {
+            String variable = "%" + variables[i] + "%";
+            String replacement = variables[i+1];
+
+            toFormat = toFormat.replace(variable, replacement);
+        }
+        return toFormat;
+    }
+
+    /**
      * Shorthand notation for ${@link ChatColor#translateAlternateColorCodes(char, String)}.
      *
      * @param string The string to be colorized.

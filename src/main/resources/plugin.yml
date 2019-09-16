@@ -8,7 +8,7 @@ authors: [flogic]
 depend: [ProtocolLib]
 commands:
   setcolor:
-    aliases: sc
+    aliases: [sc, setcolour]
     description: Sets the color of your name in chat.
   titlebroadcast:
     aliases: tbc
