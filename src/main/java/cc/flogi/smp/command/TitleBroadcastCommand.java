@@ -1,5 +1,6 @@
 package cc.flogi.smp.command;
 
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.UtilUI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -30,7 +31,7 @@ import org.bukkit.command.CommandSender;
                     } else if (string.startsWith("fadeout:")) {
                         fadeOut = Integer.parseInt(string.substring("fadeout:".length()));
                     } else {
-                        //Matches %nl% & {nl} case insensitive.
+                        //Matches %nl% & {nl} case-insensitive.
                         string = string.replaceFirst("[%{][Nn][Ll][%}]", "<nl>");
 
                         if (string.equalsIgnoreCase("<nl>")) {
@@ -56,7 +57,7 @@ import org.bukkit.command.CommandSender;
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7That's not a valid number!"));
+                    I18n.sendError(sender, "not_a_number", true);
                     return true;
                 }
             }
@@ -73,9 +74,8 @@ import org.bukkit.command.CommandSender;
                     finalFadeIn,
                     finalStay,
                     finalFadeOut));
-        } else {
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Insufficient permissions."));
-        }
+        } else
+            I18n.sendError(sender, "no_permission", true);
 
         return true;
     }

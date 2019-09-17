@@ -1,8 +1,8 @@
 package cc.flogi.smp.command;
 
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
-import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Sound;
@@ -30,18 +30,21 @@ public class SetColorCommand implements CommandExecutor {
                     PlayerManager.getInstance().saveToFile(gamePlayer);
 
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                    sender.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Name color set to '" + color + color.name() + "&7'"));
+                    I18n.sendMessage(player, "name_color_set", true,
+                            "c", color.toString(),
+                            "cname", color.getName());
 
                     return true;
                 }
             }
 
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Invalid color, here's a list of colors to choose from:"));
+            I18n.sendError(player, "invalid_color", true);
             for (ChatColor value : ChatColor.values()) {
                 if (!value.name().equals("MAGIC"))
                     sender.sendMessage(value + "- " + value.getName());
             }
-        }
+        } else
+            I18n.sendError(sender, "must_be_player", true);
 
         return true;
     }

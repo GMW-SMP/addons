@@ -3,7 +3,6 @@ package cc.flogi.smp.command;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
-import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -25,7 +24,7 @@ import java.util.logging.Level;
 public class MessageCommand implements CommandExecutor {
     @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Please enter a player and a message."));
+            I18n.sendError(sender, "need_player_and_message", true);
             return false;
         }
 
@@ -37,8 +36,7 @@ public class MessageCommand implements CommandExecutor {
             String message = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), ' ');
 
             if (player == target) {
-                player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You cannot message yourself."));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                I18n.sendError(player, "cannot_message_self", true, true);
                 return true;
             }
 
@@ -49,8 +47,7 @@ public class MessageCommand implements CommandExecutor {
                     if (target == null)
                         gamePlayer.setLastMessaged(null);
                 } else {
-                    player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You haven't messaged anyone recently."));
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                    I18n.sendError(player, "no_recent_messages", true, true);
                     return true;
                 }
             }
@@ -76,15 +73,13 @@ public class MessageCommand implements CommandExecutor {
                     gamePlayer.setLastMessaged(target.getUniqueId());
                     targetPlayer.setLastMessaged(player.getUniqueId());
                 } else {
-                    player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7That message is too short."));
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                    I18n.sendError(player, "message_too_short", true, true);
                 }
             } else {
-                player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Invalid player."));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                I18n.sendError(player, "invalid_player", true, true);
             }
         } else {
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Only players can message."));
+            I18n.sendError(sender, "must_be_player", true);
         }
 
         return false;
