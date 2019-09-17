@@ -37,7 +37,10 @@ public class PlayerEvent implements Listener {
             Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
             Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*(i|4)+(\\W|\\d|_)*)"),
             Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*l+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*t+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*)")
+            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(b+(\\W|\\d|_)*(e|3)+(\\W|\\d|_)*(a|4)+(\\W|\\d|_)*n+(\\W|\\d|_)*(e|3)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(k+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*k+(\\W|\\d|_)*(e|3)+(\\W|\\d|_)*)"),
+            Pattern.compile("\\b(c+(\\W|\\d|_)*h+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*n+(\\W|\\d|_)*k+(\\W|\\d|_)*)")
     };
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -103,7 +106,7 @@ public class PlayerEvent implements Listener {
                 public void run() {
                     recentlyBadPlayers.add(player.getUniqueId());
                     UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "Racism Gay", "", 5, 70, 20);
-                    SMP.get().getLogger().info(player.getName()+" tried to say a blacklisted phrase.");
+                    SMP.get().getLogger().info(player.getName() + " tried to say a blacklisted phrase.");
 
                     for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
