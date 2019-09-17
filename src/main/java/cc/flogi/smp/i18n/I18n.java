@@ -1,5 +1,6 @@
 package cc.flogi.smp.i18n;
 
+import cc.flogi.smp.SMP;
 import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  * @author Caden Kriese
@@ -55,6 +57,18 @@ public class I18n {
             locale = locales.get("en_us");
 
         sendText(player, UtilUI.format(locale.getProperty(key), variables), prefixed, true);
+    }
+
+    /**
+     * Logs a specific message in the console.
+     *
+     * @param key The key of the message to be sent.
+     * @param level The logging level for the message.
+     * @param variables Variables to replace within the message.
+     */
+    public static void logMessage(String key, Level level, String... variables) {
+        Properties locale = locales.get("en_us");
+        SMP.get().getLogger().log(level, UtilUI.format(locale.getProperty(key), variables));
     }
 
     @SuppressWarnings("Convert2MethodRef")
