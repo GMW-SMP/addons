@@ -66,7 +66,7 @@ public class BookGUI {
      * @param lines      The lines to be included. (Pages split up automatically)
      * @param footerLine The line to be set at the bottom of each page.
      */
-    //Needs suppression bc stupid JDK bug wont allow BaseComponent::toPlainText.
+    //Needs suppression bc stupid JDK bug won't allow BaseComponent::toPlainText.
     @SuppressWarnings("Convert2MethodRef")
     public BookGUI(List<BaseComponent[]> lines, BaseComponent[] footerLine) {
         ArrayList<BaseComponent[]> pages = new ArrayList<>();

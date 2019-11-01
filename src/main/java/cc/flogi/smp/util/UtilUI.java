@@ -43,7 +43,7 @@ public class UtilUI {
      * @param fadeOut The fade out duration in ticks.
      */
     public static void sendTitle(Player player, String title, int fadeIn, int stay, int fadeOut) {
-        sendTitle(player, title, "", 20, 40, 20);
+        sendTitle(player, title, "", fadeIn, stay, fadeOut);
     }
 
     /**

@@ -18,10 +18,10 @@ import org.influxdb.dto.Point;
 import java.util.stream.Stream;
 
 /**
-  SMP Plugin
-
-  Written by Caden Kriese
-  @since 5/8/2019
+ * SMP Plugin
+ *
+ * Written by Caden Kriese
+ * @since 5/8/2019
  *
  * Copyright © 2019 Caden "flogic" Kriese
  * This code is not to be redistributed or modified in any way internally or commercially.

@@ -32,7 +32,7 @@ import java.text.MessageFormat;
      * @param delay         The delay of the cooldown in ticks.
      * @param onCompletion  The runnable to be run upon completion.
      * @param message       The message to be sent to the player every 2 ticks.
-     *                      It will be formatted with two variables the first is the time remaining in seconds and the second is
+     *                      It will be formatted with two variables the first is the time remaining in seconds, and the second is
      *                      a string with the word 'seconds' or 'second'.
      * @param interruptable Should the cooldown be cancelled when the player moves or receives damage?
      */
@@ -72,7 +72,7 @@ import java.text.MessageFormat;
 
         Cooldown toRemove = this;
         this.timerTask = new BukkitRunnable() {
-            double seconds = delay / 20;
+            double seconds = delay / 20d;
 
             @Override
             public void run() {
@@ -83,7 +83,7 @@ import java.text.MessageFormat;
                     return;
                 }
 
-                double delaySeconds = delay / 20;
+                double delaySeconds = delay / 20d;
 
                 String progressBar = "&8| " + UtilUI.progressBar(10, delaySeconds - seconds, delaySeconds, '-', ChatColor.GOLD, ChatColor.WHITE) + " &8|";
                 String secondsString = seconds == 1 ? "second" : "seconds";

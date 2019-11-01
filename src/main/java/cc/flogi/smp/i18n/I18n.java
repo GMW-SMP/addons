@@ -115,6 +115,17 @@ public class I18n {
         SMP.get().getLogger().log(level, UtilUI.format(locale.getProperty(key), variables));
     }
 
+    /**
+     * Returns the colorized message.
+     *
+     * @param player The player to retrieve the locale of.
+     * @param key The key of the message to get.
+     * @param variables The variables to replace.
+     */
+    public static String getErrorMessage(CommandSender player, String key, String... variables) {
+        return UtilUI.colorize(UtilUI.format(locales.get("en_us").getProperty(key), variables));
+    }
+
     @SuppressWarnings("Convert2MethodRef")
     private static void sendText(CommandSender player, Properties locale, String message, boolean prefixed, boolean error) {
         message = UtilUI.colorize(message);
