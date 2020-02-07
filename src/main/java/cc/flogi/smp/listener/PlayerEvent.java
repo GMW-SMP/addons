@@ -5,6 +5,7 @@ import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilUI;
+import com.google.gson.Gson;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,7 +22,11 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
@@ -32,18 +37,25 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class PlayerEvent implements Listener {
 
-    private final Set<UUID> recentlyBadPlayers = new HashSet<>();
-    private final Pattern[] blacklistedPatterns = new Pattern[]{
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*g+(\\W|\\d|_)*(a|4)+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*g+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*(i|4)+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*l+(\\W|\\d|_)*(e|3|a|4)+(\\W|\\d|_)*t+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(n+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*g+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(b+(\\W|\\d|_)*(e|3)+(\\W|\\d|_)*(a|4)+(\\W|\\d|_)*n+(\\W|\\d|_)*(e|3)+(\\W|\\d|_)*r+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(k+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*k+(\\W|\\d|_)*(e|3)+(\\W|\\d|_)*)"),
-            Pattern.compile("\\b(c+(\\W|\\d|_)*h+(\\W|\\d|_)*(i|1)+(\\W|\\d|_)*n+(\\W|\\d|_)*k+(\\W|\\d|_)*)")
-    };
+    private static final Set<String> recentlyBadPlayers = new HashSet<>();
+    private static final Pattern[] blacklistedPatterns;
+
+    static {
+        Pattern[] blacklist;
+        Gson gson = new Gson();
+        try {
+            String patterns = new String(Files.readAllBytes(
+                    Paths.get(PlayerEvent.class.getResource("/i18n/chat_blacklist.json").getPath())));
+
+            blacklist = Arrays.stream(gson.fromJson(patterns, String[].class))
+                    .map(str -> Pattern.compile(str))
+                    .toArray(Pattern[]::new);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            blacklist = new Pattern[0];
+        }
+        blacklistedPatterns = blacklist;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBedEnter(PlayerBedEnterEvent event) {
@@ -53,18 +65,15 @@ public class PlayerEvent implements Listener {
         if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
             if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-                player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Bed spawn location set."));
-                UtilUI.sendActionBar(player, "Bed spawn location set.");
+                I18n.sendMessage(player, "spawn_location_set", true);
+                I18n.sendActionBar(player, "spawn_location_set", false);
             }
 
-            Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1));
-            Bukkit.broadcastMessage(gp.getNameColor() + player.getName() + ChatColor.GRAY + " has entered a bed.");
-
-            ArrayList<Player> otherPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-            otherPlayers.remove(player);
-
-            if (otherPlayers.size() == 0 || otherPlayers.stream().allMatch(Player::isSleeping))
-                Bukkit.broadcastMessage(ChatColor.GRAY + "All players are sleeping, cycling to daylight.");
+            ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+            I18n.broadcastMessage(onlinePlayers, "player_enter_bed", false, true,
+                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY);
+            if (onlinePlayers.stream().filter(Player::isSleeping).count() + 1 == Bukkit.getOnlinePlayers().size())
+                I18n.broadcastMessage(onlinePlayers, "daylight_cycle", true, true);
 
             //Send action bar to players who are sleeping.
             new BukkitRunnable() {
@@ -74,14 +83,11 @@ public class PlayerEvent implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                int sleepingPlayers = (int) Bukkit.getOnlinePlayers()
-                                                                    .stream()
-                                                                    .filter(p -> ((Player) p).isSleeping())
-                                                                    .count();
-                                int onlinePlayers = Bukkit.getOnlinePlayers().size();
-
-                                UtilUI.sendActionBar(player, ChatColor.GRAY.toString() +
-                                                                     sleepingPlayers + "/" + onlinePlayers + " players in bed.");
+                                Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
+                                Integer playersCount = onlinePlayers.size();
+                                I18n.sendActionBar(player, "players_sleeping", false,
+                                        "current", sleepingPlayers.toString(),
+                                        "max", playersCount.toString());
                             }
                         }.runTask(SMP.get());
                     } else
@@ -102,10 +108,10 @@ public class PlayerEvent implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    recentlyBadPlayers.add(player.getUniqueId());
-                    UtilUI.sendTitle(player, ChatColor.DARK_RED + ChatColor.BOLD.toString() + "Racism Gay", "", 5, 70, 20);
-                    SMP.get().getLogger().info(player.getName() + " tried to say a blacklisted phrase.");
-
+                    recentlyBadPlayers.add(player.getUniqueId().toString());
+                    UtilUI.sendTitle(player, I18n.getMessage(player, "player_swear"), "", 5, 70, 20);
+                    I18n.logMessage("player_swear_log", Level.INFO,
+                            "player", player.getName() + "(" + player.getUniqueId().toString() + ")");
                     for (int i = 0; i < 6; i++) {
                         new BukkitRunnable() {
                             @Override
@@ -118,7 +124,7 @@ public class PlayerEvent implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            recentlyBadPlayers.remove(player);
+                            recentlyBadPlayers.remove(player.getUniqueId().toString());
                         }
                     }.runTaskLater(SMP.get(), 20 * 20L);
                 }
@@ -129,10 +135,10 @@ public class PlayerEvent implements Listener {
             String deaths = String.valueOf(player.getStatistic(Statistic.DEATHS));
             String mobKills = String.valueOf(player.getStatistic(Statistic.MOB_KILLS));
             String distanceTraveled = String.format("%.2f", (double) Arrays.stream(Statistic.values())
-                                              .filter(stat -> stat.name().contains("ONE_CM"))
-                                              .map(stat -> player.getStatistic(stat))
-                                              .mapToInt(Integer::intValue)
-                                              .sum()/100000d)+"km";
+                    .filter(stat -> stat.name().contains("ONE_CM"))
+                    .map(stat -> player.getStatistic(stat))
+                    .mapToInt(Integer::intValue)
+                    .sum() / 100000d) + "km";
 
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {
@@ -209,9 +215,10 @@ public class PlayerEvent implements Listener {
         Player player = event.getEntity();
         GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
 
-        if (recentlyBadPlayers.contains(player.getUniqueId()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
-            event.setDeathMessage(gp.getNameColor() + player.getName() + ChatColor.RESET + " died of racism");
-            recentlyBadPlayers.remove(player);
+        if (recentlyBadPlayers.contains(player.getUniqueId().toString()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
+            event.setDeathMessage(I18n.getMessage(player, "swearing_death",
+                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY));
+            recentlyBadPlayers.remove(player.getUniqueId().toString());
         } else {
             event.setDeathMessage(event.getDeathMessage().replace(player.getName(), gp.getNameColor() + player.getName() + ChatColor.GRAY));
         }

@@ -3,6 +3,7 @@ package cc.flogi.smp.i18n;
 import cc.flogi.smp.SMP;
 import cc.flogi.smp.util.UtilUI;
 import com.google.gson.JsonSyntaxException;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -23,12 +25,26 @@ import java.util.logging.Level;
  * Created on 9/15/19.
  */
 public class I18n {
-    private static HashMap<String, Properties> locales = new HashMap<String, Properties>() {{
+    private static final HashMap<String, Properties> LOCALES = new HashMap<String, Properties>() {{
         put("en_us", load("en_us"));
         put("en_gb", load("en_gb"));
         put("en_au", load("en_au"));
         put("en_nz", load("en_nz"));
     }};
+    private static final Properties DEFAULT_LOCALE = LOCALES.get("en_us");
+
+    /**
+     * Sends a message to multiple players in their locale.
+     *
+     * @param players   The players to send the message to.
+     * @param key       The key of the message to send the player.
+     * @param prefixed  Should the message have the locale's prefix string appended to the beginning.
+     * @param sound     Should a sound be played to all the players.
+     * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
+     */
+    public static void broadcastMessage(Collection<? extends Player> players, String key, boolean prefixed, boolean sound, String... variables) {
+        players.forEach(pl -> sendMessage(pl, key, prefixed, sound, variables));
+    }
 
     /**
      * Sends a message to a player in their locale.
@@ -39,12 +55,7 @@ public class I18n {
      * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
      */
     public static void sendMessage(Player player, String key, boolean prefixed, String... variables) {
-        Properties locale = locales.get(player.getLocale());
-
-        if (locale == null || locale.getProperty(key) == null)
-            locale = locales.get("en_us");
-
-        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, false);
+        sendMessage(player, key, prefixed, false, variables);
     }
 
     /**
@@ -57,13 +68,36 @@ public class I18n {
      * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
      */
     public static void sendMessage(Player player, String key, boolean prefixed, boolean sound, String... variables) {
-        Properties locale = locales.get(player.getLocale());
+        Properties locale = getFromPlayer(player, key);
+        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, false, false);
+        if (sound)
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+    }
 
-        if (locale == null || locale.getProperty(key) == null)
-            locale = locales.get("en_us");
+    /**
+     * Sends a message to a player in their locale.
+     *
+     * @param player    The player to send the message to.
+     * @param key       The key of the message to send the player.
+     * @param prefixed  Should the message have the locale's prefix string appended to the beginning.
+     * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
+     */
+    public static void sendActionBar(Player player, String key, boolean prefixed, String... variables) {
+        sendMessage(player, key, prefixed, false, variables);
+    }
 
-        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, false);
-
+    /**
+     * Sends a message to a player in their locale.
+     *
+     * @param player    The player to send the message to.
+     * @param key       The key of the message to send the player.
+     * @param prefixed  Should the message have the locale's prefix string appended to the beginning.
+     * @param sound     Should the player receive a positive sound.
+     * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
+     */
+    public static void sendActionBar(Player player, String key, boolean prefixed, boolean sound, String... variables) {
+        Properties locale = getFromPlayer(player, key);
+        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, false, true);
         if (sound)
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
     }
@@ -78,13 +112,8 @@ public class I18n {
      * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
      */
     public static void sendError(Player player, String key, boolean prefixed, boolean sound, String... variables) {
-        Properties locale = locales.get(player.getLocale());
-
-        if (locale == null || locale.getProperty(key) == null)
-            locale = locales.get("en_us");
-
-        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, true);
-
+        Properties locale = getFromPlayer(player, key);
+        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, true, false);
         if (sound)
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
     }
@@ -98,9 +127,7 @@ public class I18n {
      * @param variables The variables to replace in the message, formatted as: key, value, key, value, etc.
      */
     public static void sendError(CommandSender player, String key, boolean prefixed, String... variables) {
-        Properties locale = locales.get("en_us");
-
-        sendText(player, locale, UtilUI.format(locale.getProperty(key), variables), prefixed, true);
+        sendText(player, DEFAULT_LOCALE, UtilUI.format(DEFAULT_LOCALE.getProperty(key), variables), prefixed, true, false);
     }
 
     /**
@@ -111,58 +138,83 @@ public class I18n {
      * @param variables Variables to replace within the message.
      */
     public static void logMessage(String key, Level level, String... variables) {
-        Properties locale = locales.get("en_us");
-        SMP.get().getLogger().log(level, UtilUI.format(locale.getProperty(key), variables));
+        SMP.get().getLogger().log(level, UtilUI.format(DEFAULT_LOCALE.getProperty(key), variables));
     }
 
     /**
      * Returns the colorized message.
      *
-     * @param player The player to retrieve the locale of.
-     * @param key The key of the message to get.
+     * @param player    The player to retrieve the locale of.
+     * @param key       The key of the message to get.
      * @param variables The variables to replace.
      */
-    public static String getErrorMessage(CommandSender player, String key, String... variables) {
-        return UtilUI.colorize(UtilUI.format(locales.get("en_us").getProperty(key), variables));
+    public static String getMessage(Player player, String key, String... variables) {
+        return UtilUI.colorize(UtilUI.format(getFromPlayer(player, key).getProperty(key), variables));
     }
 
     @SuppressWarnings("Convert2MethodRef")
-    private static void sendText(CommandSender player, Properties locale, String message, boolean prefixed, boolean error) {
+    private static void sendText(CommandSender player, Properties locale, String message, boolean prefixed, boolean error, boolean actionBar) {
         message = UtilUI.colorize(message);
 
         String prefixKey = error ? "error_prefix" : "prefix";
         String prefix = locale.getProperty(prefixKey);
         if (prefix == null)
-            prefix = locales.get("en_us").getProperty(prefixKey);
+            prefix = DEFAULT_LOCALE.getProperty(prefixKey);
 
         //Attempt to parse with JSON otherwise use default method to send the message.
         try {
             BaseComponent[] parsed = ComponentSerializer.parse(message);
             String parsedString = StringUtils.join(Arrays.stream(parsed)
-                                                           .map(baseComponent -> baseComponent.toPlainText())
-                                                           .toArray(String[]::new));
+                    .map(baseComponent -> baseComponent.toPlainText())
+                    .toArray(String[]::new));
 
             if (parsedString.equals(message))
                 player.sendMessage(prefixed ? UtilUI.colorize(prefix) + message : message);
             else {
-                if (prefixed) {
-                    BaseComponent[] prefixedMessage = new ComponentBuilder(UtilUI.colorize(prefix)).append(parsed).create();
-                    player.sendMessage(prefixedMessage);
-                } else
+                if (prefixed)
+                    parsed = new ComponentBuilder(UtilUI.colorize(prefix)).append(parsed).create();
+
+                if (actionBar && player instanceof Player)
+                    ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, parsed);
+                else
                     player.sendMessage(parsed);
             }
         } catch (JsonSyntaxException ex) {
-            player.sendMessage(prefixed ? UtilUI.colorize(prefix) + message : message);
+            String finalMsg = prefixed ? UtilUI.colorize(prefix) + message : message;
+            if (actionBar && player instanceof Player)
+                ((Player) player).sendActionBar(finalMsg);
+            else
+                player.sendMessage(finalMsg);
         }
     }
 
+    /**
+     * Retrieves the proper locale.
+     *
+     * @param player The player whose language should be considered.
+     * @param key    The key of the message attempting to be retrieved.
+     * @return The proper locale file.
+     */
+    private static Properties getFromPlayer(Player player, String key) {
+        Properties locale = LOCALES.get(player.getLocale());
+        if (locale == null || locale.getProperty(key) == null)
+            locale = DEFAULT_LOCALE;
+        return locale;
+    }
+
+    /**
+     * Loads a locale from src/main/resources
+     *
+     * @param locale The key of the locale to load.
+     * @return The properties class representing that localization file.
+     */
     private static Properties load(String locale) {
         try {
             Properties properties = new Properties();
             properties.load(I18n.class.getResourceAsStream("/i18n/" + locale + ".properties"));
             return properties;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
