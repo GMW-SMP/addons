@@ -2,6 +2,7 @@ package cc.flogi.smp.player;
 
 import cc.flogi.smp.SMP;
 import cc.flogi.smp.util.UtilFile;
+import cc.flogi.smp.util.UtilThreading;
 import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -88,14 +89,12 @@ public class PlayerManager {
      * @param player The player that is logging out.
      */
     public void playerLogout(Player player) {
-        new BukkitRunnable() {
-            @Override public void run() {
-                if (!player.isOnline()) {
-                    saveToFile(getGamePlayer(player));
-                    removePlayers(player);
-                }
+        UtilThreading.syncDelayed(() -> {
+            if (!player.isOnline()) {
+                saveToFile(getGamePlayer(player));
+                removePlayers(player);
             }
-        };
+        }, 200L);
     }
 
     /**
@@ -126,11 +125,7 @@ public class PlayerManager {
      * @param player The player who's data should be saved.
      */
     public void saveToFile(GamePlayer player) {
-        new BukkitRunnable() {
-            @Override public void run() {
-                UtilFile.writeAndCreate(player, getDataFile(player.getUuid()));
-            }
-        }.runTaskAsynchronously(SMP.get());
+        UtilThreading.async(() -> UtilFile.writeAndCreate(player, getDataFile(player.getUuid())));
     }
 
     private File getDataFile(UUID uuid) {

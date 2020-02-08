@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class UtilFile {
 
-    private static Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     /**
      * Reads text from a file.
@@ -56,7 +56,7 @@ public class UtilFile {
      * @param file   The file to be written to.
      */
     @NonNull public static void write(Object object, File file) {
-        write(gson.toJson(object), file);
+        write(GSON.toJson(object), file);
     }
 
     @NonNull public static void writeAndCreate(String string, File file) {
@@ -71,6 +71,6 @@ public class UtilFile {
     }
 
     @NonNull public static void writeAndCreate(Object object, File file) {
-        writeAndCreate(gson.toJson(object), file);
+        writeAndCreate(GSON.toJson(object), file);
     }
 }

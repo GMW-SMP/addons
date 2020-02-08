@@ -133,8 +133,8 @@ public class BookGUI {
 
         try {
             protocol.sendServerPacket(player, bookPacket);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (InvocationTargetException ex) {
+            ex.printStackTrace();
         } finally {
             player.getInventory().setItemInMainHand(previousItem);
         }

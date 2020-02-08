@@ -6,6 +6,7 @@ import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
+import cc.flogi.smp.util.UtilThreading;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
@@ -84,24 +85,22 @@ public final class SMP extends JavaPlugin {
         }
 
         if (influxDatabase != null) {
-            new BukkitRunnable() {
-                @Override public void run() {
-                    int loadedChunks = Bukkit.getWorlds().stream().mapToInt(world -> world.getLoadedChunks().length).sum();
+            UtilThreading.asyncRepeating(() -> {
+                int loadedChunks = Bukkit.getWorlds().stream().mapToInt(world -> world.getLoadedChunks().length).sum();
 
-                    influxDatabase.addPoint(Point.measurement("server_stats")
-                                                    .addField("online_players", Bukkit.getOnlinePlayers().size())
-                                                    .build()
-                    );
-                    influxDatabase.addPoint(Point.measurement("server_stats")
-                                                    .addField("tps", Bukkit.getTPS()[0])
-                                                    .build()
-                    );
-                    influxDatabase.addPoint(Point.measurement("server_stats")
-                                                    .addField("loaded_chunks", loadedChunks)
-                                                    .build()
-                    );
-                }
-            }.runTaskTimerAsynchronously(INSTANCE, STAT_PUSH_INTERVAL, STAT_PUSH_INTERVAL);
+                influxDatabase.addPoint(Point.measurement("server_stats")
+                        .addField("online_players", Bukkit.getOnlinePlayers().size())
+                        .build()
+                );
+                influxDatabase.addPoint(Point.measurement("server_stats")
+                        .addField("tps", Bukkit.getTPS()[0])
+                        .build()
+                );
+                influxDatabase.addPoint(Point.measurement("server_stats")
+                        .addField("loaded_chunks", loadedChunks)
+                        .build()
+                );
+            }, STAT_PUSH_INTERVAL, STAT_PUSH_INTERVAL);
         } else {
             getLogger().warning("INFLUX DATABASE CONNECTION FAILED, NO STATISTICS WILL BE WRITTEN.");
         }

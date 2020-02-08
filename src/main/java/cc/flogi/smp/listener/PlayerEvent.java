@@ -4,6 +4,7 @@ import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
+import cc.flogi.smp.util.UtilThreading;
 import cc.flogi.smp.util.UtilUI;
 import com.google.gson.Gson;
 import net.md_5.bungee.api.ChatColor;
@@ -25,13 +26,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
  * @author Caden Kriese (flogic)
- * <p>
+ *
  * Created on 2019-05-07
  */
 @SuppressWarnings("ALL")
@@ -80,16 +84,13 @@ public class PlayerEvent implements Listener {
                 @Override
                 public void run() {
                     if (player.isSleeping()) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
-                                Integer playersCount = onlinePlayers.size();
-                                I18n.sendActionBar(player, "players_sleeping", false,
-                                        "current", sleepingPlayers.toString(),
-                                        "max", playersCount.toString());
-                            }
-                        }.runTask(SMP.get());
+                        UtilThreading.sync(() -> {
+                            Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
+                            Integer playersCount = onlinePlayers.size();
+                            I18n.sendActionBar(player, "players_sleeping", false,
+                                    "current", sleepingPlayers.toString(),
+                                    "max", playersCount.toString());
+                        });
                     } else
                         this.cancel();
                 }
@@ -105,30 +106,17 @@ public class PlayerEvent implements Listener {
 
         if (Arrays.stream(blacklistedPatterns).anyMatch(pat -> pat.matcher(strippedMessage).find())) {
             event.setCancelled(true);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    recentlyBadPlayers.add(player.getUniqueId().toString());
-                    UtilUI.sendTitle(player, I18n.getMessage(player, "player_swear"), "", 5, 70, 20);
-                    I18n.logMessage("player_swear_log", Level.INFO,
-                            "player", player.getName() + "(" + player.getUniqueId().toString() + ")");
-                    for (int i = 0; i < 6; i++) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                player.getWorld().strikeLightning(player.getLocation());
-                            }
-                        }.runTaskLater(SMP.get(), i * 3);
-                    }
-
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            recentlyBadPlayers.remove(player.getUniqueId().toString());
-                        }
-                    }.runTaskLater(SMP.get(), 20 * 20L);
+            UtilThreading.sync(() -> {
+                recentlyBadPlayers.add(player.getUniqueId().toString());
+                UtilUI.sendTitle(player, I18n.getMessage(player, "player_swear"), "", 5, 70, 20);
+                I18n.logMessage("player_swear_log", Level.INFO,
+                        "player", player.getName() + "(" + player.getUniqueId().toString() + ")");
+                for (int i = 0; i < 6; i++) {
+                    UtilThreading.syncDelayed(() -> player.getWorld().strikeLightning(player.getLocation()), i * 3);
                 }
-            }.runTask(SMP.get());
+
+                UtilThreading.syncDelayed(() -> recentlyBadPlayers.remove(player.getUniqueId().toString()), 400);
+            });
         }
 
         if (!event.isCancelled()) {
@@ -150,12 +138,8 @@ public class PlayerEvent implements Listener {
                             "mobs_killed", mobKills,
                             "distance_traveled", distanceTraveled);
 
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-                        }
-                    }.runTask(SMP.get());
+                    UtilThreading.sync(() -> onlinePlayer.playSound(onlinePlayer.getLocation(),
+                            Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1));
                 } else {
                     I18n.sendMessage(onlinePlayer, "chat_format", false,
                             "name", player.getName(),
@@ -182,8 +166,7 @@ public class PlayerEvent implements Listener {
             if (event.getClickedInventory() instanceof AnvilInventory) {
                 if (event.getSlot() == 2 && event.getCurrentItem() != null && event.getCurrentItem().getItemMeta().hasDisplayName()) {
                     if (event.getCurrentItem().getItemMeta().getDisplayName().contains("\u00A7")) {
-                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                        player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Colorized item name."));
+                        I18n.sendMessage(player, "item_colorized", true, true);
                     }
                 }
             }
@@ -194,7 +177,7 @@ public class PlayerEvent implements Listener {
     public void onDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer((Player) event.getEntity());
-            gamePlayer.interruptCooldowns("Damage taken.");
+            gamePlayer.interruptCooldowns(I18n.getMessage(gamePlayer.getPlayer(), "damage_taken"));
         }
     }
 
@@ -205,7 +188,7 @@ public class PlayerEvent implements Listener {
         if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockZ()) == 1 || Math.abs(diff.getBlockY()) == 1) {
             if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
                 GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
-                gamePlayer.interruptCooldowns("Movement detected.");
+                gamePlayer.interruptCooldowns(I18n.getMessage(gamePlayer.getPlayer(), "movement_detected"));
             }
         }
     }
