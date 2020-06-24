@@ -19,8 +19,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -163,11 +163,10 @@ public class PlayerEvent implements Listener {
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
 
-            if (event.getClickedInventory() instanceof AnvilInventory) {
+            if (event.getClickedInventory().getType() == InventoryType.ANVIL) {
                 if (event.getSlot() == 2 && event.getCurrentItem() != null && event.getCurrentItem().getItemMeta().hasDisplayName()) {
-                    if (event.getCurrentItem().getItemMeta().getDisplayName().contains("\u00A7")) {
+                    if (event.getCurrentItem().getItemMeta().getDisplayName().contains("\u00A7"))
                         I18n.sendMessage(player, "item_colorized", true, true);
-                    }
                 }
             }
         }
@@ -214,8 +213,8 @@ public class PlayerEvent implements Listener {
         PlayerManager.getInstance().addPlayers(event.getPlayer());
 
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
-        ChatColor color = gamePlayer.getNameColor();
-        Bukkit.broadcastMessage(UtilUI.colorize("&8[&a+&8] " + color + event.getPlayer().getName()));
+        I18n.broadcastMessage(Bukkit.getOnlinePlayers(), "player_join", false, false,
+                "player", gamePlayer.getNameColor() + event.getPlayer().getName());
 
         String mcVer = Bukkit.getVersion();
         mcVer = mcVer.substring(mcVer.indexOf(":") + 2, mcVer.indexOf(")"));
@@ -232,7 +231,7 @@ public class PlayerEvent implements Listener {
         PlayerManager.getInstance().playerLogout(event.getPlayer());
 
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
-        ChatColor color = gamePlayer.getNameColor();
-        Bukkit.broadcastMessage(UtilUI.colorize("&8[&c-&8] &3" + color + event.getPlayer().getName()));
+        I18n.broadcastMessage(Bukkit.getOnlinePlayers(), "player_leave", false, false,
+                "player", gamePlayer.getNameColor() + event.getPlayer().getName());
     }
 }
