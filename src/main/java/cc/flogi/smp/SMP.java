@@ -4,7 +4,6 @@ import cc.flogi.smp.command.*;
 import cc.flogi.smp.database.InfluxDatabase;
 import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
-import cc.flogi.smp.listener.ExperienceEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilThreading;
@@ -38,7 +37,7 @@ public final class SMP extends JavaPlugin {
         INSTANCE = this;
 
         //Events
-        Bukkit.getPluginManager().registerEvents(new ExperienceEvent(), this);
+//        Bukkit.getPluginManager().registerEvents(new ExperienceEvent(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerEvent(), this);
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
@@ -58,9 +57,6 @@ public final class SMP extends JavaPlugin {
         Stream.of("message", "tell", "t", "msg", "pm", "reply", "r")
                 .map(this::getCommand).filter(Objects::nonNull)
                 .forEach(cmd -> cmd.setExecutor(new MessageCommand()));
-        Stream.of("smpwhitelist")
-                .map(this::getCommand).filter(Objects::nonNull)
-                .forEach(cmd -> cmd.setExecutor(new SMPWhitelistCommand()));
 
         //Classes
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));

@@ -25,8 +25,6 @@ commands:
   reply:
     aliases: r
     description: Send a response to your last message.
-  smpwhitelist:
-    description: A specific command that only allows adding people to the whitelist, not removing.
   home:
     aliases: [bedtp, h]
     description: Teleports the executing player to their current respawn location.

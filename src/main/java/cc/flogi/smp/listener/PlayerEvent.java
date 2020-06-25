@@ -163,6 +163,9 @@ public class PlayerEvent implements Listener {
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
 
+            if (event.getClickedInventory() == null)
+                return;
+
             if (event.getClickedInventory().getType() == InventoryType.ANVIL) {
                 if (event.getSlot() == 2 && event.getCurrentItem() != null && event.getCurrentItem().getItemMeta().hasDisplayName()) {
                     if (event.getCurrentItem().getItemMeta().getDisplayName().contains("\u00A7"))
