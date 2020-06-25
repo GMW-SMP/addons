@@ -1,10 +1,9 @@
 package cc.flogi.smp.command;
 
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
-import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,30 +17,33 @@ import org.jetbrains.annotations.NotNull;
  * Created on 2019-05-11
  */
 public class SetColorCommand implements CommandExecutor {
-    @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(player);
 
             if (args.length > 0) {
-                if (EnumUtils.isValidEnum(ChatColor.class, args[0].toUpperCase())) {
-                    ChatColor color = ChatColor.valueOf(args[0].toUpperCase());
+                try {
+                    ChatColor color = ChatColor.of(args[0].toUpperCase());
                     gamePlayer.setNameColor(color);
                     PlayerManager.getInstance().saveToFile(gamePlayer);
 
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                    sender.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Name color set to '" + color + color.name() + "&7'"));
+                    I18n.sendMessage(player, "name_color_set", true,
+                            "c", color.toString(),
+                            "cname", color.getName());
 
+                    return true;
+                } catch (IllegalArgumentException ex) {
+                    I18n.sendError(player, "invalid_color", true);
                     return true;
                 }
             }
 
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Invalid color, here's a list of colors to choose from:"));
-            for (ChatColor value : ChatColor.values()) {
-                if (!value.name().equals("MAGIC"))
-                    sender.sendMessage(value + "- " + value.getName());
-            }
-        }
+            I18n.sendError(player, "invalid_color", true);
+        } else
+            I18n.sendError(sender, "must_be_player", true);
 
         return true;
     }

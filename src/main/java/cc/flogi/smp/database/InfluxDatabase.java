@@ -16,19 +16,16 @@ public class InfluxDatabase {
     public InfluxDatabase(String host, String username, String password) {
         DB = InfluxDBFactory.connect(host, username, password);
 
-        if (DB.ping().getVersion().equalsIgnoreCase("unknown")) {
+        if (DB.ping().getVersion().equalsIgnoreCase("unknown"))
             return;
-        }
 
         DB.enableBatch(5, 1, TimeUnit.SECONDS);
-
         System.out.println("Connected to Influx!");
     }
 
     public InfluxDatabase withDatabase(String name, InfluxRetentionPolicy policy) {
-        if (DB.databaseExists(name)) {
+        if (DB.databaseExists(name))
             return this;
-        }
 
         retentionPolicy = policy.getName();
 

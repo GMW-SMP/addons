@@ -1,8 +1,7 @@
 package cc.flogi.smp.listener;
 
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.UtilUI;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
@@ -25,10 +24,8 @@ public class BlockEvent implements Listener {
         }
 
         //Notify player. '\u00A7' is a section sign, similar to an ampersand. MC Uses it for color codes.
-        Player player = event.getPlayer();
         if (Arrays.stream(event.getLines()).anyMatch(line -> line.contains("\u00A7"))) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-            player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Colorized sign text."));
+            I18n.sendMessage(event.getPlayer(), "sign_colorized", true, true);
         }
     }
 

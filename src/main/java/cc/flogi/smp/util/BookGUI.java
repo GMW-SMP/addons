@@ -1,10 +1,5 @@
 package cc.flogi.smp.util;
 
-import cc.flogi.smp.SMP;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -14,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +21,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class BookGUI {
-    private ItemStack book;
+    private final ItemStack book;
 
     /**
      * Creates a BookGUI from the given params.
@@ -37,6 +31,9 @@ public class BookGUI {
     public BookGUI(List<BaseComponent[]> pages) {
         book = new ItemStack(Material.WRITTEN_BOOK);
         BookMeta meta = (BookMeta) book.getItemMeta();
+        //Fixes invalid book issue.
+        meta.setTitle("Server Book");
+        meta.setAuthor("Server");
         meta.spigot().setPages(pages);
 
         book.setItemMeta(meta);
@@ -51,6 +48,9 @@ public class BookGUI {
     public BookGUI(List<String> pages, boolean colorize) {
         book = new ItemStack(Material.WRITTEN_BOOK);
         BookMeta meta = (BookMeta) book.getItemMeta();
+        //Fixes invalid book issue.
+        meta.setTitle("Server Book");
+        meta.setAuthor("Server");
 
         if (colorize)
             meta.setPages(pages.stream().map(UtilUI::colorize).collect(Collectors.toList()));
@@ -66,7 +66,7 @@ public class BookGUI {
      * @param lines      The lines to be included. (Pages split up automatically)
      * @param footerLine The line to be set at the bottom of each page.
      */
-    //Needs suppression bc stupid JDK bug wont allow BaseComponent::toPlainText.
+    //Needs suppression bc stupid JDK bug won't allow BaseComponent::toPlainText.
     @SuppressWarnings("Convert2MethodRef")
     public BookGUI(List<BaseComponent[]> lines, BaseComponent[] footerLine) {
         ArrayList<BaseComponent[]> pages = new ArrayList<>();
@@ -74,11 +74,11 @@ public class BookGUI {
 
         int stringIndex = 0;
         int trueLineCount = lines.stream()
-                                    .map(c -> UtilUI.countLines(StringUtils.join(Arrays.stream(c)
-                                                                       .map(cmp -> cmp.toPlainText())
-                                                                       .toArray(String[]::new))))
-                                    .mapToInt(Integer::intValue)
-                                    .sum();
+                .map(c -> UtilUI.countLines(StringUtils.join(Arrays.stream(c)
+                        .map(cmp -> cmp.toPlainText())
+                        .toArray(String[]::new))))
+                .mapToInt(Integer::intValue)
+                .sum();
 
         for (int page = 0; page <= trueLineCount / 13; page++) {
             for (int lineNum = 0; lineNum < 14; lineNum++) {
@@ -90,8 +90,8 @@ public class BookGUI {
                 if (stringIndex < lines.size()) {
                     BaseComponent[] lineText = lines.get(stringIndex);
                     int lineCount = UtilUI.countLines(StringUtils.join(Arrays.stream(lineText)
-                                                                               .map(comp -> comp.toPlainText())
-                                                                               .toArray(String[]::new)));
+                            .map(comp -> comp.toPlainText())
+                            .toArray(String[]::new)));
 
                     if (lineCount + lineNum < 13) {
                         builder.append(lineText);
@@ -113,6 +113,9 @@ public class BookGUI {
 
         book = new ItemStack(Material.WRITTEN_BOOK);
         BookMeta meta = (BookMeta) book.getItemMeta();
+        //Fixes invalid book issue.
+        meta.setTitle("Server Book");
+        meta.setAuthor("Server");
         meta.spigot().setPages(pages);
 
         book.setItemMeta(meta);
@@ -124,19 +127,6 @@ public class BookGUI {
      * @param player The player to send the book packet to.
      */
     public void open(Player player) {
-        ItemStack previousItem = player.getInventory().getItemInMainHand();
-        player.getInventory().setItemInMainHand(book);
-
-        ProtocolManager protocol = SMP.get().getProtocolManager();
-        PacketContainer bookPacket = protocol.createPacket(PacketType.Play.Server.OPEN_BOOK);
-        bookPacket.getHands().write(0, EnumWrappers.Hand.MAIN_HAND);
-
-        try {
-            protocol.sendServerPacket(player, bookPacket);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } finally {
-            player.getInventory().setItemInMainHand(previousItem);
-        }
+        player.openBook(book);
     }
 }
