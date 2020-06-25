@@ -1,6 +1,5 @@
 package cc.flogi.smp.listener;
 
-import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
@@ -8,6 +7,7 @@ import cc.flogi.smp.util.UtilThreading;
 import cc.flogi.smp.util.UtilUI;
 import com.google.gson.Gson;
 import net.md_5.bungee.api.ChatColor;
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -20,13 +20,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,8 +48,7 @@ public class PlayerEvent implements Listener {
         Pattern[] blacklist;
         Gson gson = new Gson();
         try {
-            String patterns = new String(Files.readAllBytes(
-                    Paths.get(PlayerEvent.class.getResource("/i18n/chat_blacklist.json").getPath())));
+            String patterns = IOUtils.toString(PlayerEvent.class.getResourceAsStream("/i18n/chat_blacklist.json"), StandardCharsets.UTF_8);
 
             blacklist = Arrays.stream(gson.fromJson(patterns, String[].class))
                     .map(str -> Pattern.compile(str))
@@ -61,42 +60,43 @@ public class PlayerEvent implements Listener {
         blacklistedPatterns = blacklist;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBedEnter(PlayerBedEnterEvent event) {
-        Player player = event.getPlayer();
-        GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
-
-        if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
-            if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
-                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-                I18n.sendMessage(player, "spawn_location_set", true);
-                I18n.sendActionBar(player, "spawn_location_set", false);
-            }
-
-            ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-            I18n.broadcastMessage(onlinePlayers, "player_enter_bed", false, true,
-                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY);
-            if (onlinePlayers.stream().filter(Player::isSleeping).count() + 1 == Bukkit.getOnlinePlayers().size())
-                I18n.broadcastMessage(onlinePlayers, "daylight_cycle", true, true);
-
-            //Send action bar to players who are sleeping.
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (player.isSleeping()) {
-                        UtilThreading.sync(() -> {
-                            Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
-                            Integer playersCount = onlinePlayers.size();
-                            I18n.sendActionBar(player, "players_sleeping", false,
-                                    "current", sleepingPlayers.toString(),
-                                    "max", playersCount.toString());
-                        });
-                    } else
-                        this.cancel();
-                }
-            }.runTaskTimerAsynchronously(SMP.get(), 20L, 35L);
-        }
-    }
+    //REMOVED IN FAVOR OF 3RD PARTY SOLUTION
+//    @EventHandler(priority = EventPriority.HIGHEST)
+//    public void onBedEnter(PlayerBedEnterEvent event) {
+//        Player player = event.getPlayer();
+//        GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
+//
+//        if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
+//            if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
+//                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+//                I18n.sendMessage(player, "spawn_location_set", true);
+//                I18n.sendActionBar(player, "spawn_location_set", false);
+//            }
+//
+//            ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+//            I18n.broadcastMessage(onlinePlayers, "player_enter_bed", false, true,
+//                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY);
+//            if (onlinePlayers.stream().filter(Player::isSleeping).count() + 1 == Bukkit.getOnlinePlayers().size())
+//                I18n.broadcastMessage(onlinePlayers, "daylight_cycle", true, true);
+//
+//            //Send action bar to players who are sleeping.
+//            new BukkitRunnable() {
+//                @Override
+//                public void run() {
+//                    if (player.isSleeping()) {
+//                        UtilThreading.sync(() -> {
+//                            Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
+//                            Integer playersCount = onlinePlayers.size();
+//                            I18n.sendActionBar(player, "players_sleeping", false,
+//                                    "current", sleepingPlayers.toString(),
+//                                    "max", playersCount.toString());
+//                        });
+//                    } else
+//                        this.cancel();
+//                }
+//            }.runTaskTimerAsynchronously(SMP.get(), 20L, 35L);
+//        }
+//    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncChat(AsyncPlayerChatEvent event) {
@@ -215,13 +215,6 @@ public class PlayerEvent implements Listener {
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
         I18n.broadcastMessage(Bukkit.getOnlinePlayers(), "player_join", false, false,
                 "player", gamePlayer.getNameColor() + event.getPlayer().getName());
-
-        String mcVer = Bukkit.getVersion();
-        mcVer = mcVer.substring(mcVer.indexOf(":") + 2, mcVer.indexOf(")"));
-        String smpVer = SMP.get().getDescription().getVersion();
-
-        event.getPlayer().setPlayerListHeader(UtilUI.colorize("&a&lSMP\n&7You're playing on smp.flogi.cc."));
-        event.getPlayer().setPlayerListFooter(UtilUI.colorize("&8MC " + mcVer + " | SMP " + smpVer));
     }
 
     @EventHandler

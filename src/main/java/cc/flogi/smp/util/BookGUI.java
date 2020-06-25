@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class BookGUI {
-    private ItemStack book;
+    private final ItemStack book;
 
     /**
      * Creates a BookGUI from the given params.

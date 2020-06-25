@@ -177,12 +177,12 @@ public class I18n {
                 if (actionBar && player instanceof Player)
                     ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, parsed);
                 else
-                    player.sendMessage(parsed);
+                    player.spigot().sendMessage(parsed);
             }
         } catch (JsonSyntaxException ex) {
             String finalMsg = prefixed ? UtilUI.colorize(prefix) + message : message;
             if (actionBar && player instanceof Player)
-                ((Player) player).sendActionBar(finalMsg);
+                UtilUI.sendActionBar((Player) player, message);
             else
                 player.sendMessage(finalMsg);
         }

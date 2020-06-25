@@ -42,6 +42,7 @@ public class ExperienceEvent implements Listener {
             float amount = Math.min(player.getExp(), 5f);
             meta.setLore(Collections.singletonList(I18n.getMessage(player, "add_xp_prompt",
                     "amount", amount + " lvls")));
+            product.setItemMeta(meta);
         }
     }
 
@@ -51,14 +52,16 @@ public class ExperienceEvent implements Listener {
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.GLASS_BOTTLE) {
                 if (event.getClick() == ClickType.SHIFT_LEFT) {
                     ItemStack item = event.getCurrentItem();
+                    ItemMeta meta = item.getItemMeta();
                     Player player = (Player) event.getWhoClicked();
                     float amount = Math.min(player.getExp(), 5f);
                     item.setType(Material.EXPERIENCE_BOTTLE);
-                    item.setLore(Collections.singletonList(I18n.getMessage(player, "xp_amount",
+                    meta.setLore(Collections.singletonList(I18n.getMessage(player, "xp_amount",
                             "amount", amount + " lvls")));
-
-                    item.getItemMeta().getPersistentDataContainer().set(new NamespacedKey(SMP.get(), "xp_amount"),
+                    meta.getPersistentDataContainer().set(new NamespacedKey(SMP.get(), "xp_amount"),
                             PersistentDataType.FLOAT, amount);
+
+                    item.setItemMeta(meta);
                 }
             }
         }

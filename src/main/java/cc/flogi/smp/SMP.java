@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.influxdb.dto.Point;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -27,7 +28,6 @@ import java.util.stream.Stream;
  * Copyright © 2019 Caden "flogic" Kriese
  * This code is not to be redistributed or modified in any way internally or commercially.
  */
-@SuppressWarnings({"ConstantConditions", "FieldCanBeLocal"})
 public final class SMP extends JavaPlugin {
     private static SMP INSTANCE;
 
@@ -45,20 +45,23 @@ public final class SMP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
+        Stream.of("home", "bedtp", "h")
+                .map(this::getCommand).filter(Objects::nonNull)
+                .forEach(cmd -> cmd.setExecutor(new HomeCommand()));
         Stream.of("setcolor", "setcolour", "sc")
-                .map(this::getCommand)
+                .map(this::getCommand).filter(Objects::nonNull)
                 .forEach(cmd -> cmd.setExecutor(new SetColorCommand()));
         Stream.of("titlebroadcast", "tbc")
-                .map(this::getCommand)
+                .map(this::getCommand).filter(Objects::nonNull)
                 .forEach(cmd -> cmd.setExecutor(new TitleBroadcastCommand()));
         Stream.of("marks", "bookmarks", "bm", "bookmark")
-                .map(this::getCommand)
+                .map(this::getCommand).filter(Objects::nonNull)
                 .forEach(cmd -> cmd.setExecutor(new BookmarkCommand()));
         Stream.of("message", "tell", "t", "msg", "pm", "reply", "r")
-                .map(this::getCommand)
+                .map(this::getCommand).filter(Objects::nonNull)
                 .forEach(cmd -> cmd.setExecutor(new MessageCommand()));
         Stream.of("smpwhitelist")
-                .map(this::getCommand)
+                .map(this::getCommand).filter(Objects::nonNull)
                 .forEach(cmd -> cmd.setExecutor(new SMPWhitelistCommand()));
 
         //Classes
@@ -93,10 +96,11 @@ public final class SMP extends JavaPlugin {
                         .addField("online_players", Bukkit.getOnlinePlayers().size())
                         .build()
                 );
-                influxDatabase.addPoint(Point.measurement("server_stats")
-                        .addField("tps", Bukkit.getTPS()[0])
-                        .build()
-                );
+                //FIXME reimplement on paper.
+//                influxDatabase.addPoint(Point.measurement("server_stats")
+//                        .addField("tps", Bukkit.getTPS()[0])
+//                        .build()
+//                );
                 influxDatabase.addPoint(Point.measurement("server_stats")
                         .addField("loaded_chunks", loadedChunks)
                         .build()

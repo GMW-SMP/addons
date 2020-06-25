@@ -1,6 +1,8 @@
 package cc.flogi.smp.util;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 
@@ -13,12 +15,24 @@ import java.util.HashMap;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class UtilUI {
-    public static final HashMap<Character, Double> CHAR_WIDTHS = new HashMap<Character, Double>(){{
-        put(':', 0.3); put('.', 0.3); put(',', 0.3); put('i', 0.3); put('|', 0.3); put('!', 0.3);
+    public static final HashMap<Character, Double> CHAR_WIDTHS = new HashMap<Character, Double>() {{
+        put(':', 0.3);
+        put('.', 0.3);
+        put(',', 0.3);
+        put('i', 0.3);
+        put('|', 0.3);
+        put('!', 0.3);
         put('t', 0.678);
-        put('[', 0.703); put(']', 0.703);
-        put('{', 0.863); put('}', 0.863); put('<', 0.863); put('>', 0.863); put('"', 0.863); put('*', 0.863);
-        put('l', 0.5); put('`', 0.5);
+        put('[', 0.703);
+        put(']', 0.703);
+        put('{', 0.863);
+        put('}', 0.863);
+        put('<', 0.863);
+        put('>', 0.863);
+        put('"', 0.863);
+        put('*', 0.863);
+        put('l', 0.5);
+        put('`', 0.5);
         put('@', 1.1875);
     }};
 
@@ -30,7 +44,9 @@ public class UtilUI {
      * @param message The message to be sent (with color codes to be replaced).
      */
     public static void sendActionBar(Player player, String message) {
-        player.sendActionBar('&', message);
+        //FIXME Convert back to paper method ASAP
+//        player.sendActionBar('&', message);
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
     }
 
     /**
@@ -106,14 +122,14 @@ public class UtilUI {
      * Utility for formatting strings with variables.
      * The given strings are split into key/value pairs.
      *
-     * @param toFormat The string to format with the variables.
+     * @param toFormat  The string to format with the variables.
      * @param variables The variables to format the string with,
      * @return The string with the variables replaced.
      */
     public static String format(String toFormat, String... variables) {
         for (int i = 0; i < variables.length; i += 2) {
             String variable = "%" + variables[i] + "%";
-            String replacement = variables[i+1];
+            String replacement = variables[i + 1];
 
             toFormat = toFormat.replace(variable, replacement);
         }

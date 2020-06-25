@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * Created on 2019-05-08
  */
 public class PlayerManager {
-    @Getter private static PlayerManager instance = new PlayerManager();
+    @Getter private static final PlayerManager instance = new PlayerManager();
 
     private final Gson GSON = new Gson();
     @Getter private final List<GamePlayer> gamePlayers = new ArrayList<>();
