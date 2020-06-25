@@ -132,7 +132,7 @@ public class PlayerEvent implements Listener {
                 if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {
                     I18n.sendMessage(onlinePlayer, "chat_format", false,
                             "name", player.getName(),
-                            "color", gamePlayer.getNameColor().toString(),
+                            "color", gamePlayer.getNameColor().getName(),
                             "message", event.getMessage().replace(onlinePlayer.getName(), ChatColor.YELLOW + onlinePlayer.getName() + ChatColor.GRAY),
                             "deaths", deaths,
                             "mobs_killed", mobKills,
@@ -143,7 +143,7 @@ public class PlayerEvent implements Listener {
                 } else {
                     I18n.sendMessage(onlinePlayer, "chat_format", false,
                             "name", player.getName(),
-                            "color", gamePlayer.getNameColor().toString(),
+                            "color", gamePlayer.getNameColor().getName(),
                             "message", event.getMessage(),
                             "deaths", deaths,
                             "mobs_killed", mobKills,
