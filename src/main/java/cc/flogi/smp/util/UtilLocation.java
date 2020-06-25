@@ -9,7 +9,10 @@ import org.bukkit.block.BlockFace;
  * Created on 2019-08-07
  */
 public class UtilLocation {
-    private static final BlockFace[] RADIAL = {BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST};
+    private static final BlockFace[] RADIAL = {
+            BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST,
+            BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
+            BlockFace.EAST, BlockFace.SOUTH_EAST};
 
     /**
      * Gets the direction of one block relative to another.

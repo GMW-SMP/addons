@@ -1,8 +1,8 @@
 package cc.flogi.smp.command;
 
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
-import cc.flogi.smp.util.UtilUI;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -13,8 +13,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 /**
  * @author Caden Kriese (flogic)
@@ -22,12 +22,9 @@ import java.util.Arrays;
  * Created on 2019-08-17
  */
 public class MessageCommand implements CommandExecutor {
-    private final String RECEIVING_FORMAT = "{0} &a&l->&r {1}&8: &7{2}";
-    private final String SENDING_FORMAT = "{0} &c&l->&r {1}&8: &7{2}";
-
     @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Please enter a player and a message."));
+            I18n.sendError(sender, "need_player_and_message", true);
             return false;
         }
 
@@ -39,8 +36,7 @@ public class MessageCommand implements CommandExecutor {
             String message = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), ' ');
 
             if (player == target) {
-                player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You cannot message yourself."));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                I18n.sendError(player, "cannot_message_self", true, true);
                 return true;
             }
 
@@ -51,8 +47,7 @@ public class MessageCommand implements CommandExecutor {
                     if (target == null)
                         gamePlayer.setLastMessaged(null);
                 } else {
-                    player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You haven't messaged anyone recently."));
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                    I18n.sendError(player, "no_recent_messages", true, true);
                     return true;
                 }
             }
@@ -62,22 +57,29 @@ public class MessageCommand implements CommandExecutor {
                 ChatColor targetColor = targetPlayer.getNameColor();
 
                 if (message.length() > 0) {
-                    player.sendMessage(UtilUI.colorize(MessageFormat.format(SENDING_FORMAT, playerColor+player.getName(), targetColor+target.getName(), message)));
-                    target.sendMessage(UtilUI.colorize(MessageFormat.format(RECEIVING_FORMAT, playerColor+player.getName(), targetColor+target.getName(), message)));
+                    String[] vars = new String[]{
+                            "sc", playerColor.toString(),
+                            "rc", targetColor.toString(),
+                            "s", player.getName(),
+                            "r", target.getName(),
+                            "msg", message
+                    };
+
+                    I18n.logMessage("pm_send", Level.INFO, vars);
+                    I18n.sendMessage(player, "pm_send", false, vars);
+                    I18n.sendMessage(target, "pm_receive", false, vars);
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                     target.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                     gamePlayer.setLastMessaged(target.getUniqueId());
                     targetPlayer.setLastMessaged(player.getUniqueId());
                 } else {
-                    player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7That message is too short."));
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                    I18n.sendError(player, "message_too_short", true, true);
                 }
             } else {
-                player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Invalid player."));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                I18n.sendError(player, "invalid_player", true, true);
             }
         } else {
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Only players can message."));
+            I18n.sendError(sender, "must_be_player", true);
         }
 
         return false;

@@ -81,11 +81,11 @@ import java.util.stream.Collectors;
     }
 
     public ChatColor getNameColor() {
-        return nameColor == null ? ChatColor.GRAY : ChatColor.valueOf(nameColor);
+        return nameColor == null ? ChatColor.GRAY : ChatColor.of(nameColor);
     }
 
     public void setNameColor(ChatColor nameColor) {
-        this.nameColor = nameColor.name();
+        this.nameColor = nameColor.getName();
     }
 
     public Player getPlayer() {

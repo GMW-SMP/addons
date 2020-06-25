@@ -1,5 +1,6 @@
 package cc.flogi.smp.command;
 
+import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.player.data.Bookmark;
@@ -13,7 +14,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -33,7 +33,7 @@ public class BookmarkCommand implements CommandExecutor {
 
     @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You must be a player to do this command."));
+            I18n.sendError(sender, "must_be_player", true);
             return true;
         }
 
@@ -112,18 +112,14 @@ public class BookmarkCommand implements CommandExecutor {
                 String name = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), ' ');
                 if (gp.removeBookmark(name)) {
                     PlayerManager.getInstance().saveToFile(gp);
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                    player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Successfully removed bookmark &f'" + name + "'&7."));
-                } else {
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-                    player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Could not find bookmark with name &f'" + name + "'&7."));
-                }
+                    I18n.sendMessage(player, "bookmark_removed", true, true, "name", name);
+                } else
+                    I18n.sendError(player, "bookmark_not_found", true, true, "name", name);
 
                 player.performCommand("bookmark edit");
-            } else {
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-                player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Please enter a bookmark to remove."));
-            }
+            } else
+                I18n.sendError(player, "enter_bookmark", true, true);
+
             return true;
         }
 
@@ -133,18 +129,14 @@ public class BookmarkCommand implements CommandExecutor {
                 gp.addBookmark((player).getLocation(), name);
                 PlayerManager.getInstance().saveToFile(gp);
 
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                player.sendMessage(UtilUI.colorize("&8[&aSMP&8] &7Added location to your bookmarks."));
+                I18n.sendMessage(player, "bookmark_added", true, true, "name", name);
             } else {
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-                player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7Maximum name length of &f" + MAX_NAME_LENGTH
-                                                           + " &7exceeded by &f" + (name.length() - MAX_NAME_LENGTH)
-                                                           + " &7characters."));
+                I18n.sendError(player, "bookmark_name_too_long", true, true,
+                        "maxlength", MAX_NAME_LENGTH+"",
+                        "difference", (name.length() - MAX_NAME_LENGTH)+"");
             }
-        } else {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-            player.sendMessage(UtilUI.colorize("&8[&cSMP&8] &7You already have a bookmark with that name."));
-        }
+        } else
+            I18n.sendError(player, "bookmark_name_taken", true, true);
 
         return true;
     }
