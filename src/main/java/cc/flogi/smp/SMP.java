@@ -8,8 +8,6 @@ import cc.flogi.smp.listener.ExperienceEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilThreading;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,6 +21,7 @@ import java.util.stream.Stream;
  * SMP Plugin
  *
  * Written by Caden Kriese
+ *
  * @since 5/8/2019
  *
  * Copyright © 2019 Caden "flogic" Kriese
@@ -31,7 +30,6 @@ import java.util.stream.Stream;
 public final class SMP extends JavaPlugin {
     private static SMP INSTANCE;
 
-    @Getter private ProtocolManager protocolManager;
     @Getter private InfluxDatabase influxDatabase;
 
     private final long STAT_PUSH_INTERVAL = 150;
@@ -65,7 +63,6 @@ public final class SMP extends JavaPlugin {
                 .forEach(cmd -> cmd.setExecutor(new SMPWhitelistCommand()));
 
         //Classes
-        protocolManager = ProtocolLibrary.getProtocolManager();
         PlayerManager.getInstance().addPlayers(Bukkit.getOnlinePlayers().toArray(new Player[]{}));
 
         // Influx
@@ -85,7 +82,7 @@ public final class SMP extends JavaPlugin {
             );
         } catch (Exception ex) {
             influxDatabase = null;
-            getLogger().warning("Connection to InfluxDB failed. ("+ex.getMessage()+")");
+            getLogger().warning("Connection to InfluxDB failed. (" + ex.getMessage() + ")");
         }
 
         if (influxDatabase != null) {
