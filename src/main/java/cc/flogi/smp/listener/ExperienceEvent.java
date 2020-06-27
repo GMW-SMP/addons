@@ -2,6 +2,7 @@ package cc.flogi.smp.listener;
 
 import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
+import cc.flogi.smp.util.UtilEXP;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -50,74 +51,40 @@ public class ExperienceEvent implements Listener {
 
     @EventHandler
     public void onInventoryInteract(InventoryClickEvent event) {
-        if (event.getClickedInventory() == null)
+        if (event.getClickedInventory() == null || !(event.getWhoClicked() instanceof Player))
             return;
 
         ItemStack item = event.getCurrentItem();
+        Player player = (Player) event.getWhoClicked();
 
-        if (item != null && item.getType() == Material.GLASS_BOTTLE) {
-            if (event.getClick() == ClickType.SHIFT_RIGHT) {
-                event.setCancelled(true);
-                Player player = (Player) event.getWhoClicked();
-                if (item.getAmount() > 1)
-                    item.setAmount(item.getAmount() - 1);
-                else
-                    player.getInventory().remove(item);
+        if (item != null &&
+                item.getType() == Material.GLASS_BOTTLE &&
+                event.getClick() == ClickType.SHIFT_RIGHT &&
+                UtilEXP.getTotalExperience(player) > 0) {
+            event.setCancelled(true);
+            if (item.getAmount() > 1)
+                item.setAmount(item.getAmount() - 1);
+            else
+                player.getInventory().remove(item);
 
-                ItemStack bottle = new ItemStack(Material.EXPERIENCE_BOTTLE);
-                ItemMeta meta = bottle.getItemMeta();
-                int amount = Math.min(player.getTotalExperience(), 50);
-//                player.setTotalExperience(player.getTotalExperience() - amount);
-                player.setTotalExperience(0);
-                player.setLevel(0);
-                player.setExp(0);
-                player.giveExp(player.getTotalExperience() - amount);
-                meta.setLore(Collections.singletonList(I18n.getMessage(player, "xp_amount",
-                        "amount", amount + "xp")));
-                meta.getPersistentDataContainer().set(new NamespacedKey(SMP.get(), "xp_amount"),
-                        PersistentDataType.INTEGER, amount);
-                bottle.setItemMeta(meta);
-                player.getInventory().addItem(bottle);
-            }
+            ItemStack bottle = new ItemStack(Material.EXPERIENCE_BOTTLE);
+            ItemMeta meta = bottle.getItemMeta();
+            int amount = Math.min(player.getTotalExperience(), 50);
+            UtilEXP.addExperience(player, -amount);
+            meta.setLore(Collections.singletonList(I18n.getMessage(player, "xp_amount",
+                    "amount", amount + "xp")));
+            meta.getPersistentDataContainer().set(new NamespacedKey(SMP.get(), "xp_amount"),
+                    PersistentDataType.INTEGER, amount);
+            bottle.setItemMeta(meta);
+            player.getInventory().addItem(bottle);
         }
     }
-
-//    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-//    public void onProjectileLaunch(ProjectileLaunchEvent event) {
-//        //TODO handle other shooters.
-//        if (event.getEntity().getShooter() instanceof Player) {
-//            Player player = (Player) event.getEntity().getShooter();
-//            if (event.getEntity() instanceof ThrownExpBottle) {
-//                ItemStack stack = player.getInventory().getItemInMainHand();
-//                NamespacedKey key = new NamespacedKey(SMP.get(), "xp_amount");
-//                ItemMeta meta = stack.getItemMeta();
-//                float amount = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
-//                ThrownExpBottle bottle = (ThrownExpBottle) event.getEntity();
-//                bottle.getPersistentDataContainer().set(key, PersistentDataType.FLOAT, amount);
-//            }
-//        } else if (event.getEntity().getShooter() instanceof Dispenser) {
-//            Dispenser dispenser = (Dispenser) event.getEntity().getShooter();
-//        }
-//    }
-//
-//    @EventHandler
-//    public void onInteract(PlayerInteractEvent event) {
-//        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-//            ItemStack item = event.getItem();
-//            if (item != null && item.getType() == Material.EXPERIENCE_BOTTLE && item.hasItemMeta()) {
-//                Float amount = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(SMP.get(), "xp_amount"), PersistentDataType.FLOAT);
-//                if (amount != null) {
-//
-//                }
-//            }
-//        }
-//    }
 
     @SuppressWarnings("ConstantConditions") @EventHandler
     public void onExpBottle(ExpBottleEvent event) {
         NamespacedKey key = new NamespacedKey(SMP.get(), "xp_amount");
         ItemMeta meta = event.getEntity().getItem().getItemMeta();
-        if (meta == null)
+        if (meta == null || !meta.getPersistentDataContainer().has(key, PersistentDataType.INTEGER))
             return;
 
         event.setExperience(meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
