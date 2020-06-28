@@ -13,22 +13,23 @@ public class UtilEXP {
     /**
      * Adds experience to a player.
      *
-     * @param player The player whos xp should be added to.
-     * @param exp    The amount to be added to their xp (positive or negative)
+     * @param player       The player whos xp should be added to.
+     * @param exp          The amount to be added to their xp (positive or negative)
+     * @param applyMending Should mending be effected by this experience given.
      */
-    public static void addExperience(final Player player, final int exp) {
-        setTotalExperience(player, getTotalExperience(player) + exp);
+    public static void addExperience(final Player player, final int exp, final boolean applyMending) {
+        setTotalExperience(player, getTotalExperience(player) + exp, applyMending);
     }
 
     /**
      * Sets the total experience of a player.
      * Accounts for crappy bukkit xp logic.
      *
-     * @param player The player to set the xp of.
-     * @param exp    The amount of xp to set.
+     * @param player       The player to set the xp of.
+     * @param exp          The amount of xp to set.
+     * @param applyMending Should mending be effected by this experience given.
      */
-    //FIXME add param for mending when using paper.
-    public static void setTotalExperience(final Player player, final int exp) {
+    public static void setTotalExperience(final Player player, final int exp, final boolean applyMending) {
         if (exp < 0) {
             throw new IllegalArgumentException("Experience is negative!");
         }
@@ -44,11 +45,11 @@ public class UtilEXP {
             amount -= expToLevel;
             if (amount >= 0) {
                 // give until next level
-                player.giveExp(expToLevel);
+                player.giveExp(expToLevel, applyMending);
             } else {
                 // give the rest
                 amount += expToLevel;
-                player.giveExp(amount);
+                player.giveExp(amount, applyMending);
                 amount = 0;
             }
         }

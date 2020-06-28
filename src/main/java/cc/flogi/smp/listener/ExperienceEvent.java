@@ -70,7 +70,7 @@ public class ExperienceEvent implements Listener {
             ItemStack bottle = new ItemStack(Material.EXPERIENCE_BOTTLE);
             ItemMeta meta = bottle.getItemMeta();
             int amount = Math.min(player.getTotalExperience(), 50);
-            UtilEXP.addExperience(player, -amount);
+            UtilEXP.addExperience(player, -amount, false);
             meta.setLore(Collections.singletonList(I18n.getMessage(player, "xp_amount",
                     "amount", amount + "xp")));
             meta.getPersistentDataContainer().set(new NamespacedKey(SMP.get(), "xp_amount"),
