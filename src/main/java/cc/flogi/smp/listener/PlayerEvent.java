@@ -60,44 +60,6 @@ public class PlayerEvent implements Listener {
         blacklistedPatterns = blacklist;
     }
 
-    //REMOVED IN FAVOR OF 3RD PARTY SOLUTION
-//    @EventHandler(priority = EventPriority.HIGHEST)
-//    public void onBedEnter(PlayerBedEnterEvent event) {
-//        Player player = event.getPlayer();
-//        GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
-//
-//        if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
-//            if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
-//                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-//                I18n.sendMessage(player, "spawn_location_set", true);
-//                I18n.sendActionBar(player, "spawn_location_set", false);
-//            }
-//
-//            ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-//            I18n.broadcastMessage(onlinePlayers, "player_enter_bed", false, true,
-//                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY);
-//            if (onlinePlayers.stream().filter(Player::isSleeping).count() + 1 == Bukkit.getOnlinePlayers().size())
-//                I18n.broadcastMessage(onlinePlayers, "daylight_cycle", true, true);
-//
-//            //Send action bar to players who are sleeping.
-//            new BukkitRunnable() {
-//                @Override
-//                public void run() {
-//                    if (player.isSleeping()) {
-//                        UtilThreading.sync(() -> {
-//                            Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
-//                            Integer playersCount = onlinePlayers.size();
-//                            I18n.sendActionBar(player, "players_sleeping", false,
-//                                    "current", sleepingPlayers.toString(),
-//                                    "max", playersCount.toString());
-//                        });
-//                    } else
-//                        this.cancel();
-//                }
-//            }.runTaskTimerAsynchronously(SMP.get(), 20L, 35L);
-//        }
-//    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -115,7 +77,7 @@ public class PlayerEvent implements Listener {
                     UtilThreading.syncDelayed(() -> player.getWorld().strikeLightning(player.getLocation()), i * 3);
                 }
 
-                UtilThreading.syncDelayed(() -> recentlyBadPlayers.remove(player.getUniqueId().toString()), 400);
+                UtilThreading.syncDelayed(() -> recentlyBadPlayers.remove(player.getUniqueId().toString()), 500);
             });
         }
 
@@ -127,6 +89,9 @@ public class PlayerEvent implements Listener {
                     .map(stat -> player.getStatistic(stat))
                     .mapToInt(Integer::intValue)
                     .sum() / 100000d) + "km";
+
+            //Fixes players sending quotes to mess up json encoding by adding a \ infront.
+            event.setMessage(event.getMessage().replace("\"", "\\\""));
 
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {

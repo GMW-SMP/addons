@@ -40,9 +40,9 @@ import java.util.stream.Collectors;
 
     public void interruptCooldowns(String message) {
         List<Cooldown> cooldownsFiltered = activeCountdowns
-                                                   .stream()
-                                                   .filter(Cooldown::isInterruptable)
-                                                   .collect(Collectors.toList());
+                .stream()
+                .filter(Cooldown::isInterruptable)
+                .collect(Collectors.toList());
 
         cooldownsFiltered.forEach(Cooldown::cancel);
         activeCountdowns.removeAll(cooldownsFiltered);
@@ -71,9 +71,9 @@ import java.util.stream.Collectors;
 
     public boolean removeBookmark(String name) {
         Bookmark bookmark = bookmarks.stream()
-                                    .filter(mark -> mark.getName().equalsIgnoreCase(name))
-                                    .findFirst()
-                                    .orElse(null);
+                .filter(mark -> mark.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
 
         bookmarks.remove(bookmark);
 
@@ -85,6 +85,8 @@ import java.util.stream.Collectors;
     }
 
     public void setNameColor(ChatColor nameColor) {
+        Player player = getPlayer();
+        player.setDisplayName(nameColor + player.getName() + ChatColor.RESET);
         this.nameColor = nameColor.getName();
     }
 
