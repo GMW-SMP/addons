@@ -1,8 +1,6 @@
 package cc.flogi.smp.util;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 
@@ -44,9 +42,7 @@ public class UtilUI {
      * @param message The message to be sent (with color codes to be replaced).
      */
     public static void sendActionBar(Player player, String message) {
-        //FIXME Convert back to paper method ASAP
-//        player.sendActionBar('&', message);
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
+        player.sendActionBar('&', message);
     }
 
     /**

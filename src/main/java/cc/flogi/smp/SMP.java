@@ -89,11 +89,10 @@ public final class SMP extends JavaPlugin {
                         .addField("online_players", Bukkit.getOnlinePlayers().size())
                         .build()
                 );
-                //FIXME reimplement on paper.
-//                influxDatabase.addPoint(Point.measurement("server_stats")
-//                        .addField("tps", Bukkit.getTPS()[0])
-//                        .build()
-//                );
+                influxDatabase.addPoint(Point.measurement("server_stats")
+                        .addField("tps", Bukkit.getTPS()[0])
+                        .build()
+                );
                 influxDatabase.addPoint(Point.measurement("server_stats")
                         .addField("loaded_chunks", loadedChunks)
                         .build()
