@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.Inventory;
@@ -31,23 +30,7 @@ import java.util.Collections;
  * Created on 02/11/2020.
  */
 public class ExperienceEvent implements Listener {
-    @EventHandler
-    public void onPrepareItemCraft(PrepareItemCraftEvent event) {
-        if (event.getRecipe() == null)
-            return;
-
-        ItemStack product = event.getRecipe().getResult();
-
-        if (product.getType() == Material.GLASS_BOTTLE) {
-            Player player = (Player) event.getInventory().getViewers().get(0);
-            ItemMeta meta = product.getItemMeta();
-            int amount = Math.min(player.getTotalExperience(), 50);
-            meta.setLore(Collections.singletonList(I18n.getMessage(player, "add_xp_prompt",
-                    "amount", amount + "xp")));
-            product.setItemMeta(meta);
-            event.getInventory().setResult(product);
-        }
-    }
+    final int MAX_XP_PER_BOTTLE = 50;
 
     @EventHandler
     public void onInventoryInteract(InventoryClickEvent event) {
@@ -62,6 +45,7 @@ public class ExperienceEvent implements Listener {
                 event.getClick() == ClickType.SHIFT_RIGHT &&
                 UtilEXP.getTotalExperience(player) > 0) {
             event.setCancelled(true);
+
             if (item.getAmount() > 1)
                 item.setAmount(item.getAmount() - 1);
             else
@@ -69,7 +53,7 @@ public class ExperienceEvent implements Listener {
 
             ItemStack bottle = new ItemStack(Material.EXPERIENCE_BOTTLE);
             ItemMeta meta = bottle.getItemMeta();
-            int amount = Math.min(player.getTotalExperience(), 50);
+            int amount = Math.min(player.getTotalExperience(), MAX_XP_PER_BOTTLE);
             UtilEXP.addExperience(player, -amount, false);
             meta.setLore(Collections.singletonList(I18n.getMessage(player, "xp_amount",
                     "amount", amount + "xp")));
@@ -78,6 +62,16 @@ public class ExperienceEvent implements Listener {
             bottle.setItemMeta(meta);
             player.getInventory().addItem(bottle);
         }
+    }
+
+    @EventHandler
+    public void onPrepareItemCraft(PrepareItemCraftEvent event) {
+        if (event.getRecipe() == null || event.getInventory().getResult() == null)
+            return;
+
+        Player player = (Player) event.getInventory().getViewers().get(0);
+
+        applyXpLore(event.getInventory().getResult(), player);
     }
 
     @SuppressWarnings("ConstantConditions") @EventHandler
@@ -92,24 +86,8 @@ public class ExperienceEvent implements Listener {
 
     @EventHandler
     public void onEntityPickupItem(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            int amount = Math.min(player.getTotalExperience(), 50);
-            ItemStack item = event.getItem().getItemStack();
-            ItemMeta meta = item.getItemMeta();
-            meta.setLore(Collections.singletonList(I18n.getMessage(player, "add_xp_prompt",
-                    "amount", amount + "xp")));
-            item.setItemMeta(meta);
-            event.getItem().remove();
-            event.setCancelled(true);
-            ((Player) event.getEntity()).getInventory().addItem(item);
-        }
-    }
-
-    //FIXME may create bugs in inventories with multiple viewers.
-    @EventHandler
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        updateBottles((Player) event.getPlayer(), event.getInventory());
+        if (event.getEntity() instanceof Player)
+            applyXpLore(event.getItem().getItemStack(), (Player) event.getEntity());
     }
 
     @EventHandler
@@ -118,16 +96,32 @@ public class ExperienceEvent implements Listener {
     }
 
     private void updateBottles(Player player, Inventory inventory) {
-        int amount = Math.min(player.getTotalExperience(), 50);
+        int amount = Math.min(UtilEXP.getTotalExperience(player), MAX_XP_PER_BOTTLE);
         ItemStack[] items = inventory.getContents();
 
         inventory.setContents(Arrays.stream(items).peek(item -> {
             if (item != null && item.getType() == Material.GLASS_BOTTLE) {
                 ItemMeta meta = item.getItemMeta();
-                meta.setLore(Collections.singletonList(I18n.getMessage(player, "add_xp_prompt",
-                        "amount", amount + "xp")));
+                if (amount == 0)
+                    meta.setLore(null);
+                else
+                    meta.setLore(Collections.singletonList(I18n.getMessage(player, "add_xp_prompt",
+                            "amount", amount + "xp")));
                 item.setItemMeta(meta);
             }
         }).toArray(ItemStack[]::new));
+    }
+
+    private void applyXpLore(ItemStack item, Player player) {
+        if (item.getType() == Material.GLASS_BOTTLE) {
+            int amount = Math.min(UtilEXP.getTotalExperience(player), MAX_XP_PER_BOTTLE);
+            ItemMeta meta = item.getItemMeta();
+            if (player.getTotalExperience() > 0)
+                meta.setLore(Collections.singletonList(I18n.getMessage(player, "add_xp_prompt",
+                        "amount", amount + "xp")));
+            else
+                meta.setLore(null);
+            item.setItemMeta(meta);
+        }
     }
 }
