@@ -86,7 +86,7 @@ import java.util.stream.Collectors;
 
     public void setNameColor(ChatColor nameColor) {
         Player player = getPlayer();
-        player.setDisplayName(nameColor + player.getName() + ChatColor.RESET);
+        UtilUI.setNameColor(player, nameColor);
         this.nameColor = nameColor.getName();
     }
 

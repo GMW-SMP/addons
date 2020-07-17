@@ -8,6 +8,8 @@ import cc.flogi.smp.listener.ExperienceEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilThreading;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,12 +32,14 @@ import java.util.stream.Stream;
 public final class SMP extends JavaPlugin {
     private static SMP INSTANCE;
 
+    @Getter private ProtocolManager protocolManager;
     @Getter private InfluxDatabase influxDatabase;
 
     private final long STAT_PUSH_INTERVAL = 150;
 
     @Override public void onEnable() {
         INSTANCE = this;
+        protocolManager = ProtocolLibrary.getProtocolManager();
 
         //Events
         Bukkit.getPluginManager().registerEvents(new ExperienceEvent(), this);

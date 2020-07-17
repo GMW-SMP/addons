@@ -1,3 +1,3 @@
-# SMP
+# SMP Addons
 
-Assisting plugin for SMP servers, written by Caden Kriese "flogic".
+Addons plugin for the GMW-SMP servers, written by Caden "flogic" Kriese.

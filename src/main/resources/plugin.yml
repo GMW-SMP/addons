@@ -4,6 +4,7 @@ description: ${project.description}
 main: cc.flogi.smp.SMP
 api-version: 1.13
 prefix: SMP
+depend: [ProtocolLib]
 authors: [flogic]
 commands:
   setcolor:
