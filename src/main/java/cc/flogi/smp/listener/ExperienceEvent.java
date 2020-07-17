@@ -4,8 +4,10 @@ import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.UtilEXP;
 import com.google.common.collect.ImmutableList;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,6 +26,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -68,8 +71,16 @@ public class ExperienceEvent implements Listener {
             meta.getPersistentDataContainer().set(new NamespacedKey(SMP.get(), "xp_amount"),
                     PersistentDataType.INTEGER, amount);
             bottle.setItemMeta(meta);
-            player.getInventory().addItem(bottle);
-        } else if (event.getClickedInventory().contains(Material.GLASS_BOTTLE)) {
+            HashMap<Integer, ItemStack> overflow = player.getInventory().addItem(bottle);
+            if (overflow.size() > 0) {
+                for (ItemStack stack : overflow.values())
+                    player.getWorld().dropItem(player.getLocation(), stack);
+            }
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 0.33f);
+        } else if (item == null
+                && event.getCursor() == null
+                && event.getClickedInventory().contains(Material.GLASS_BOTTLE)) {
+            Bukkit.broadcastMessage("Updating bottles from inv click.");
             updateBottles(player, event.getClickedInventory());
         }
     }
@@ -108,6 +119,8 @@ public class ExperienceEvent implements Listener {
 
     @EventHandler
     public void onPlayerOpenInventory(InventoryOpenEvent event) {
+        // TODO maybe remove lores if the bottles are in an inventory like a brewing stand.
+        // TODO also handle drinking a water bottle and it turning into a glass bottle.
         if (event.getPlayer() instanceof Player)
             updateBottles((Player) event.getPlayer(), event.getInventory());
     }
