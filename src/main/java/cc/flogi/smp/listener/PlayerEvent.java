@@ -172,6 +172,23 @@ public class PlayerEvent implements Listener {
         } else {
             event.setDeathMessage(event.getDeathMessage().replace(player.getName(), gp.getNameColor() + player.getName() + ChatColor.GRAY));
         }
+
+        gp.removeBookmark("Death");
+        gp.addBookmark(player.getLocation(), "Death");
+
+        Location loc = player.getLocation();
+        String locString = loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ();
+        String worldName = player.getWorld().getName();
+        switch (worldName) {
+            case "world": worldName = "Overworld"; break;
+            case "world_nether": worldName = "Nether"; break;
+            case "world_the_end": worldName = "End"; break;
+            default: break;
+        }
+
+        I18n.sendError(player, "death_location", true,
+                "location", locString,
+                "world", worldName);
     }
 
     @EventHandler
@@ -181,6 +198,7 @@ public class PlayerEvent implements Listener {
         PlayerManager.getInstance().addPlayers(event.getPlayer());
 
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        UtilUI.setNameColor(event.getPlayer(), gamePlayer.getNameColor());
         I18n.broadcastMessage(Bukkit.getOnlinePlayers(), "player_join", false, false,
                 "player", gamePlayer.getNameColor() + event.getPlayer().getName());
     }

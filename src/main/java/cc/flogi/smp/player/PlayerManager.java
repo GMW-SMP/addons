@@ -70,7 +70,11 @@ public class PlayerManager {
      * @param players The players to remove.
      */
     public void addPlayers(Player... players) {
-        gamePlayers.addAll(Arrays.stream(players).map(this::loadFromFile).collect(Collectors.toList()));
+        gamePlayers.addAll(Arrays.stream(players)
+                .map(this::loadFromFile)
+                .filter(gp -> !gamePlayers.contains(gp))
+                .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -93,7 +97,7 @@ public class PlayerManager {
                 saveToFile(getGamePlayer(player));
                 removePlayers(player);
             }
-        }, 200L);
+        }, 1000L);
     }
 
     /**

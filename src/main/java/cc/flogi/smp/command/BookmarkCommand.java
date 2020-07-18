@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -31,7 +32,8 @@ import java.util.Arrays;
 public class BookmarkCommand implements CommandExecutor {
     private final int MAX_NAME_LENGTH = 19;
 
-    @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
             I18n.sendError(sender, "must_be_player", true);
             return true;
@@ -45,16 +47,16 @@ public class BookmarkCommand implements CommandExecutor {
 
         if (args[0].equalsIgnoreCase("list")) {
             BaseComponent[] footer = new ComponentBuilder("EDIT")
-                                             .color(ChatColor.DARK_GREEN)
-                                             .bold(true)
-                                             .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to edit your bookmarks.")
-                                                                                                        .color(ChatColor.GREEN).create()))
-                                             .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmark edit")).create();
+                    .color(ChatColor.DARK_GREEN)
+                    .bold(true)
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder("Click to edit your bookmarks.")
+                            .color(ChatColor.GREEN).create())))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmark edit")).create();
             ArrayList<BaseComponent[]> lines = new ArrayList<>();
 
             Bookmark[] validBookmarks = gp.getBookmarks().stream()
-                                                .filter(bm -> bm.getWorld().equals(player.getWorld().getName()))
-                                                .toArray(Bookmark[]::new);
+                    .filter(bm -> bm.getWorld().equals(player.getWorld().getName()))
+                    .toArray(Bookmark[]::new);
 
             for (Bookmark mark : validBookmarks) {
                 String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
@@ -64,12 +66,12 @@ public class BookmarkCommand implements CommandExecutor {
                 BaseComponent[] directions = new ComponentBuilder(UtilUI.colorize("&2~ " + (int) player.getLocation().distance(loc) + " blocks " + blockFace + ".")).create();
 
                 lines.add(new ComponentBuilder(mark.getName())
-                                  .color(ChatColor.GOLD)
-                                  .append(UtilUI.colorize("&7&l|"))
-                                  .append(cordsString)
-                                  .color(ChatColor.GREEN)
-                                  .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, directions))
-                                  .create());
+                        .color(ChatColor.GOLD)
+                        .append(UtilUI.colorize("&7&l|"))
+                        .append(cordsString)
+                        .color(ChatColor.GREEN)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(directions)))
+                        .create());
 
             }
 
@@ -77,31 +79,31 @@ public class BookmarkCommand implements CommandExecutor {
             return true;
         } else if (args[0].equalsIgnoreCase("edit")) {
             BaseComponent[] footer = new ComponentBuilder("BACK")
-                                             .color(ChatColor.DARK_RED)
-                                             .bold(true)
-                                             .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Return to bookmarks list.")
-                                                                                                        .color(ChatColor.RED).create()))
-                                             .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmarks")).create();
+                    .color(ChatColor.DARK_RED)
+                    .bold(true)
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder("Return to bookmarks list.")
+                            .color(ChatColor.RED).create())))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmarks")).create();
             ArrayList<BaseComponent[]> lines = new ArrayList<>();
 
             Bookmark[] validBookmarks = gp.getBookmarks().stream()
-                                                .filter(bm -> bm.getWorld().equals(player.getWorld().getName()))
-                                                .toArray(Bookmark[]::new);
+                    .filter(bm -> bm.getWorld().equals(player.getWorld().getName()))
+                    .toArray(Bookmark[]::new);
 
             for (Bookmark mark : validBookmarks) {
                 String cordsString = (int) mark.getX() + "," + (int) mark.getY() + "," + (int) mark.getZ();
 
                 lines.add(new ComponentBuilder(mark.getName())
-                                  .color(ChatColor.GOLD)
-                                  .append(UtilUI.colorize("&7&l|"))
-                                  .append(cordsString)
-                                  .color(ChatColor.GREEN)
-                                  .append(" [-]")
-                                  .color(ChatColor.RED)
-                                  .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to remove '" + mark.getName() + "'.")
-                                                                                             .color(ChatColor.RED).create()))
-                                  .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmark remove " + mark.getName()))
-                                  .create());
+                        .color(ChatColor.GOLD)
+                        .append(UtilUI.colorize("&7&l|"))
+                        .append(cordsString)
+                        .color(ChatColor.GREEN)
+                        .append(" [-]")
+                        .color(ChatColor.RED)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder("Click to remove '" + mark.getName() + "'.")
+                                .color(ChatColor.RED).create())))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookmark remove " + mark.getName()))
+                        .create());
 
             }
 
@@ -132,8 +134,8 @@ public class BookmarkCommand implements CommandExecutor {
                 I18n.sendMessage(player, "bookmark_added", true, true, "name", name);
             } else {
                 I18n.sendError(player, "bookmark_name_too_long", true, true,
-                        "maxlength", MAX_NAME_LENGTH+"",
-                        "difference", (name.length() - MAX_NAME_LENGTH)+"");
+                        "maxlength", MAX_NAME_LENGTH + "",
+                        "difference", (name.length() - MAX_NAME_LENGTH) + "");
             }
         } else
             I18n.sendError(player, "bookmark_name_taken", true, true);
