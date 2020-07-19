@@ -6,7 +6,6 @@ import cc.flogi.smp.util.UtilThreading;
 import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,16 +65,20 @@ public class PlayerManager {
     }
 
     /**
-     * Performs log out tasks for a player, such as, writing data and closing their object.
+     * Adds a list of players to the current list.
      *
      * @param players The players to remove.
      */
     public void addPlayers(Player... players) {
-        gamePlayers.addAll(Arrays.stream(players).map(this::loadFromFile).collect(Collectors.toList()));
+        gamePlayers.addAll(Arrays.stream(players)
+                .map(this::loadFromFile)
+                .filter(gp -> !gamePlayers.contains(gp))
+                .collect(Collectors.toList())
+        );
     }
 
     /**
-     * Performs log out tasks for a player, such as, writing data and closing their object.
+     * Removes a list of players to the current list.
      *
      * @param players The players to remove.
      */
@@ -94,7 +97,7 @@ public class PlayerManager {
                 saveToFile(getGamePlayer(player));
                 removePlayers(player);
             }
-        }, 200L);
+        }, 1000L);
     }
 
     /**

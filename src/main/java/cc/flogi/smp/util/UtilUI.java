@@ -151,4 +151,31 @@ public class UtilUI {
     public static String strip(String string) {
         return ChatColor.stripColor(string);
     }
+
+    /**
+     * Sets the name color of a player in tab and overhead.
+     *
+     * @param player The player to modify.
+     * @param color  The color to apply to their name.
+     */
+    public static void setNameColor(Player player, ChatColor color) {
+        player.setPlayerListName(color + player.getName());
+        //TODO Fix and implement this to set overhead name color.
+//        ProtocolManager pm = SMP.get().getProtocolManager();
+//
+//        String colorizedName = ComponentSerializer.toString(new ComponentBuilder(player.getName()).color(color).create());
+//
+//        WrappedDataWatcher watcher = new WrappedDataWatcher(player);
+//        WrappedDataWatcher.Serializer chatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+//        WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
+//        watcher.setEntity(player);
+//        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, chatSerializer), Optional.of(WrappedChatComponent.fromJson(colorizedName).getHandle()));
+//        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, booleanSerializer), true);
+//
+//        PacketContainer packet = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+//        packet.getIntegers().write(0, player.getEntityId());
+//        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+//
+//        pm.broadcastServerPacket(packet);
+    }
 }

@@ -20,7 +20,7 @@ public class HomeCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             //TODO Make teleporting to a respawn anchor remove a charge.
-            if (player.getBedSpawnLocation() != null) {
+            if (player.getBedSpawnLocation() != null && player.getWorld() == player.getBedSpawnLocation().getWorld()) {
                 new Cooldown(player, 2, 100, () -> player.teleport(player.getBedSpawnLocation()),
                         I18n.getMessage(player, "teleporting_home",
                                 "time", "{0}",

@@ -60,44 +60,6 @@ public class PlayerEvent implements Listener {
         blacklistedPatterns = blacklist;
     }
 
-    //REMOVED IN FAVOR OF 3RD PARTY SOLUTION
-//    @EventHandler(priority = EventPriority.HIGHEST)
-//    public void onBedEnter(PlayerBedEnterEvent event) {
-//        Player player = event.getPlayer();
-//        GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
-//
-//        if (!event.isCancelled() && event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.OK) {
-//            if (player.getBedSpawnLocation() == null || player.getBedSpawnLocation().distance(event.getBed().getLocation()) > 2) {
-//                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-//                I18n.sendMessage(player, "spawn_location_set", true);
-//                I18n.sendActionBar(player, "spawn_location_set", false);
-//            }
-//
-//            ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-//            I18n.broadcastMessage(onlinePlayers, "player_enter_bed", false, true,
-//                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY);
-//            if (onlinePlayers.stream().filter(Player::isSleeping).count() + 1 == Bukkit.getOnlinePlayers().size())
-//                I18n.broadcastMessage(onlinePlayers, "daylight_cycle", true, true);
-//
-//            //Send action bar to players who are sleeping.
-//            new BukkitRunnable() {
-//                @Override
-//                public void run() {
-//                    if (player.isSleeping()) {
-//                        UtilThreading.sync(() -> {
-//                            Long sleepingPlayers = onlinePlayers.stream().filter(Player::isSleeping).count();
-//                            Integer playersCount = onlinePlayers.size();
-//                            I18n.sendActionBar(player, "players_sleeping", false,
-//                                    "current", sleepingPlayers.toString(),
-//                                    "max", playersCount.toString());
-//                        });
-//                    } else
-//                        this.cancel();
-//                }
-//            }.runTaskTimerAsynchronously(SMP.get(), 20L, 35L);
-//        }
-//    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -115,7 +77,7 @@ public class PlayerEvent implements Listener {
                     UtilThreading.syncDelayed(() -> player.getWorld().strikeLightning(player.getLocation()), i * 3);
                 }
 
-                UtilThreading.syncDelayed(() -> recentlyBadPlayers.remove(player.getUniqueId().toString()), 400);
+                UtilThreading.syncDelayed(() -> recentlyBadPlayers.remove(player.getUniqueId().toString()), 500);
             });
         }
 
@@ -127,6 +89,9 @@ public class PlayerEvent implements Listener {
                     .map(stat -> player.getStatistic(stat))
                     .mapToInt(Integer::intValue)
                     .sum() / 100000d) + "km";
+
+            //Fixes players sending quotes to mess up json encoding by adding a \ infront.
+            event.setMessage(event.getMessage().replace("\"", "\\\""));
 
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (player != onlinePlayer && event.getMessage().contains(onlinePlayer.getName())) {
@@ -187,7 +152,7 @@ public class PlayerEvent implements Listener {
     public void onMove(PlayerMoveEvent event) {
         //Clone to avoid modifying the from location.
         Location diff = event.getFrom().clone().subtract(event.getTo());
-        if (Math.abs(diff.getBlockX()) == 1 || Math.abs(diff.getBlockZ()) == 1 || Math.abs(diff.getBlockY()) == 1) {
+        if (Math.abs(diff.getBlockX()) >= 1 || Math.abs(diff.getBlockZ()) >= 1 || Math.abs(diff.getBlockY()) >= 1) {
             if (PlayerManager.getInstance().getGamePlayer(event.getPlayer()).getActiveCountdowns().size() > 0) {
                 GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
                 gamePlayer.interruptCooldowns(I18n.getMessage(gamePlayer.getPlayer(), "movement_detected"));
@@ -207,6 +172,23 @@ public class PlayerEvent implements Listener {
         } else {
             event.setDeathMessage(event.getDeathMessage().replace(player.getName(), gp.getNameColor() + player.getName() + ChatColor.GRAY));
         }
+
+        gp.removeBookmark("Death");
+        gp.addBookmark(player.getLocation(), "Death");
+
+        Location loc = player.getLocation();
+        String locString = loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ();
+        String worldName = player.getWorld().getName();
+        switch (worldName) {
+            case "world": worldName = "Overworld"; break;
+            case "world_nether": worldName = "Nether"; break;
+            case "world_the_end": worldName = "End"; break;
+            default: break;
+        }
+
+        I18n.sendError(player, "death_location", true,
+                "location", locString,
+                "world", worldName);
     }
 
     @EventHandler
@@ -216,6 +198,7 @@ public class PlayerEvent implements Listener {
         PlayerManager.getInstance().addPlayers(event.getPlayer());
 
         GamePlayer gamePlayer = PlayerManager.getInstance().getGamePlayer(event.getPlayer());
+        UtilUI.setNameColor(event.getPlayer(), gamePlayer.getNameColor());
         I18n.broadcastMessage(Bukkit.getOnlinePlayers(), "player_join", false, false,
                 "player", gamePlayer.getNameColor() + event.getPlayer().getName());
     }

@@ -4,8 +4,8 @@ description: ${project.description}
 main: cc.flogi.smp.SMP
 api-version: 1.13
 prefix: SMP
-authors: [flogic]
 depend: [ProtocolLib]
+authors: [flogic]
 commands:
   setcolor:
     aliases: [sc, setcolour]
