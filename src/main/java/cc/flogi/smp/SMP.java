@@ -6,16 +6,27 @@ import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
 import cc.flogi.smp.listener.ExperienceEvent;
 import cc.flogi.smp.listener.PlayerEvent;
+import cc.flogi.smp.player.GamePlayer;
 import cc.flogi.smp.player.PlayerManager;
 import cc.flogi.smp.util.UtilThreading;
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import lombok.Getter;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.influxdb.dto.Point;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -31,17 +42,34 @@ import java.util.stream.Stream;
  */
 public final class SMP extends JavaPlugin {
     private static SMP INSTANCE;
-
+    private final long STAT_PUSH_INTERVAL = 150;
     @Getter private ProtocolManager protocolManager;
     @Getter private InfluxDatabase influxDatabase;
 
-    private final long STAT_PUSH_INTERVAL = 150;
+    public static SMP get() {
+        return INSTANCE;
+    }
 
     @Override public void onEnable() {
         INSTANCE = this;
         protocolManager = ProtocolLibrary.getProtocolManager();
 
         //Events
+        protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
+            @Override public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                PlayerInfoData data = packet.getPlayerInfoDataLists().read(0).get(0);
+                Player player = Bukkit.getPlayer(data.getProfile().getUUID());
+                if (player != null) {
+                    GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
+                    String colorizedName = ComponentSerializer.toString(new ComponentBuilder(player.getName()).color(gp.getNameColor()).create());
+                    data = new PlayerInfoData(data.getProfile().withName(""), data.getLatency(), data.getGameMode(), WrappedChatComponent.fromJson(colorizedName));
+                    packet.getPlayerInfoDataLists().write(0, Collections.singletonList(data));
+                    event.setPacket(packet);
+                }
+            }
+        });
+
         Bukkit.getPluginManager().registerEvents(new ExperienceEvent(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerEvent(), this);
         Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
@@ -106,9 +134,5 @@ public final class SMP extends JavaPlugin {
         } else {
             getLogger().warning("INFLUX DATABASE CONNECTION FAILED, NO STATISTICS WILL BE WRITTEN.");
         }
-    }
-
-    public static SMP get() {
-        return INSTANCE;
     }
 }

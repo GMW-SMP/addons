@@ -36,6 +36,8 @@ public class SetColorCommand implements CommandExecutor {
 
                     return true;
                 } catch (IllegalArgumentException ex) {
+                    ex.printStackTrace();
+
                     I18n.sendError(player, "invalid_color", true);
                     return true;
                 }

@@ -1,8 +1,16 @@
 package cc.flogi.smp.util;
 
+import cc.flogi.smp.SMP;
+import cc.flogi.smp.player.PlayerManager;
+import com.comphenix.protocol.ProtocolManager;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
 
@@ -161,21 +169,35 @@ public class UtilUI {
     public static void setNameColor(Player player, ChatColor color) {
         player.setPlayerListName(color + player.getName());
         //TODO Fix and implement this to set overhead name color.
-//        ProtocolManager pm = SMP.get().getProtocolManager();
+        ProtocolManager pm = SMP.get().getProtocolManager();
+
+        String colorizedName = ComponentSerializer.toString(new ComponentBuilder(player.getName()).color(color).create());
+
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        String teamname = player.getUniqueId().toString().replace("-", "").substring(0, 16);
+        Team team = scoreboard.getTeam(teamname);
+        if (scoreboard.getTeam(teamname) == null)
+            team = scoreboard.registerNewTeam(teamname);
+
+        team.setSuffix(PlayerManager.getInstance().getGamePlayer(player).getNameColor()+player.getName());
+        team.addEntry(player.getName());
+
+//        PacketContainer destroyPacket = pm.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
+//        destroyPacket.getIntegerArrays().write(0, new int[]{player.getEntityId()});
+//        UtilProtocol.broadcastPacketToAllExcept(player, destroyPacket);
 //
-//        String colorizedName = ComponentSerializer.toString(new ComponentBuilder(player.getName()).color(color).create());
-//
-//        WrappedDataWatcher watcher = new WrappedDataWatcher(player);
-//        WrappedDataWatcher.Serializer chatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
-//        WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
-//        watcher.setEntity(player);
-//        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, chatSerializer), Optional.of(WrappedChatComponent.fromJson(colorizedName).getHandle()));
-//        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, booleanSerializer), true);
-//
-//        PacketContainer packet = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-//        packet.getIntegers().write(0, player.getEntityId());
-//        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
-//
+//        PacketContainer packet = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
+//        PlayerInfoData data = new PlayerInfoData(WrappedGameProfile.fromPlayer(player), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(colorizedName));
+//        packet.getPlayerInfoDataLists().write(0, ImmutableList.of(data));
+//        packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
 //        pm.broadcastServerPacket(packet);
+//
+//        PacketContainer spawnPacket = pm.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
+//        spawnPacket.getIntegers().write(0, player.getEntityId());
+//        spawnPacket.getUUIDs().write(0, player.getUniqueId());
+//        spawnPacket.getDoubles().write(0, player.getLocation().getX());
+//        spawnPacket.getDoubles().write(1, player.getLocation().getY());
+//        spawnPacket.getDoubles().write(2, player.getLocation().getZ());
+//        UtilProtocol.broadcastPacketToAllExcept(player, spawnPacket);
     }
 }
