@@ -4,6 +4,7 @@ import cc.flogi.smp.command.*;
 import cc.flogi.smp.database.InfluxDatabase;
 import cc.flogi.smp.database.influx.InfluxRetentionPolicy;
 import cc.flogi.smp.listener.BlockEvent;
+import cc.flogi.smp.listener.EntityEvent;
 import cc.flogi.smp.listener.ExperienceEvent;
 import cc.flogi.smp.listener.PlayerEvent;
 import cc.flogi.smp.player.PlayerManager;
@@ -42,9 +43,10 @@ public final class SMP extends JavaPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
 
         //Events
+        Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityEvent(), this);
         Bukkit.getPluginManager().registerEvents(new ExperienceEvent(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerEvent(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockEvent(), this);
 
         //Commands
         Stream.of("home", "bedtp", "h")
