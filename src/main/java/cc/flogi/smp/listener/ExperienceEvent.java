@@ -4,7 +4,6 @@ import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.UtilEXP;
 import com.google.common.collect.ImmutableList;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -18,16 +17,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Caden Kriese
@@ -36,13 +34,21 @@ import java.util.List;
  *
  * Created on 02/11/2020.
  */
-public class ExperienceEvent implements Listener {
+@SuppressWarnings("ConstantConditions") public class ExperienceEvent implements Listener {
     final int MAX_XP_PER_BOTTLE = 50;
 
     //XP Bottling handler
 
     @EventHandler
     public void onInventoryInteract(InventoryClickEvent event) {
+        if (event.getInventory() instanceof BrewerInventory) {
+            if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.GLASS_BOTTLE)
+                event.getCurrentItem().setItemMeta(null);
+
+            Arrays.stream(event.getInventory().getContents()).filter(Objects::nonNull).forEach(is -> is.setItemMeta(null));
+            return;
+        }
+
         if (event.getClickedInventory() == null
                 || !(event.getWhoClicked() instanceof Player)
                 || !(event.getClickedInventory() instanceof PlayerInventory))
@@ -80,7 +86,6 @@ public class ExperienceEvent implements Listener {
         } else if (item == null
                 && event.getCursor() == null
                 && event.getClickedInventory().contains(Material.GLASS_BOTTLE)) {
-            Bukkit.broadcastMessage("Updating bottles from inv click.");
             updateBottles(player, event.getClickedInventory());
         }
     }
@@ -118,10 +123,17 @@ public class ExperienceEvent implements Listener {
     }
 
     @EventHandler
+    public void onPlayerConsumeItem(PlayerItemConsumeEvent event) {
+        if (event.getItem().getType() == Material.POTION) {
+            ItemStack replacement = new ItemStack(Material.GLASS_BOTTLE);
+            applyXpLore(replacement, event.getPlayer());
+            event.setReplacement(replacement);
+        }
+    }
+
+    @EventHandler
     public void onPlayerOpenInventory(InventoryOpenEvent event) {
-        // TODO maybe remove lores if the bottles are in an inventory like a brewing stand.
-        // TODO also handle drinking a water bottle and it turning into a glass bottle.
-        if (event.getPlayer() instanceof Player)
+        if ((event.getPlayer() instanceof Player))
             updateBottles((Player) event.getPlayer(), event.getInventory());
     }
 
