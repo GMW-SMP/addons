@@ -165,10 +165,18 @@ public class PlayerEvent implements Listener {
         Player player = event.getEntity();
         GamePlayer gp = PlayerManager.getInstance().getGamePlayer(player);
 
-        if (recentlyBadPlayers.contains(player.getUniqueId().toString()) && (event.getDeathMessage().contains("burned ") || event.getDeathMessage().contains("struck by lightning"))) {
+        if (recentlyBadPlayers.contains(player.getUniqueId().toString()) &&
+                (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.LIGHTNING
+                        || player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FIRE_TICK)) {
             event.setDeathMessage(I18n.getMessage(player, "swearing_death",
                     "player", gp.getNameColor() + player.getName() + ChatColor.GRAY));
             recentlyBadPlayers.remove(player.getUniqueId().toString());
+        } else if (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
+            event.setDeathMessage(I18n.getMessage(player, "debris_death",
+                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY));
+        } else if (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.CONTACT) {
+            event.setDeathMessage(I18n.getMessage(player, "cactus_death",
+                    "player", gp.getNameColor() + player.getName() + ChatColor.GRAY));
         } else {
             event.setDeathMessage(event.getDeathMessage().replace(player.getName(), gp.getNameColor() + player.getName() + ChatColor.GRAY));
         }
@@ -180,10 +188,17 @@ public class PlayerEvent implements Listener {
         String locString = loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ();
         String worldName = player.getWorld().getName();
         switch (worldName) {
-            case "world": worldName = "Overworld"; break;
-            case "world_nether": worldName = "Nether"; break;
-            case "world_the_end": worldName = "End"; break;
-            default: break;
+            case "world":
+                worldName = "Overworld";
+                break;
+            case "world_nether":
+                worldName = "Nether";
+                break;
+            case "world_the_end":
+                worldName = "End";
+                break;
+            default:
+                break;
         }
 
         I18n.sendError(player, "death_location", true,

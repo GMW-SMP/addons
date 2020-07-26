@@ -94,7 +94,7 @@ import java.util.*;
 
     @EventHandler
     public void onPrepareItemCraft(PrepareItemCraftEvent event) {
-        if (event.getRecipe() == null || event.getInventory().getResult() == null)
+        if (event.getRecipe() == null || event.getInventory().getResult() == null || event.getViewers().size() == 0)
             return;
 
         Player player = (Player) event.getInventory().getViewers().get(0);
