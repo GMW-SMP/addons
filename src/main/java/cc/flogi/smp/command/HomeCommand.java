@@ -2,14 +2,16 @@ package cc.flogi.smp.command;
 
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.Cooldown;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.type.RespawnAnchor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * @author Caden Kriese (flogic)
@@ -30,6 +32,13 @@ public class HomeCommand implements CommandExecutor {
                     return true;
                 }
             }
+
+            double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH) == null ? 0 : Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+            if (player.getHealth() < maxHealth) {
+                I18n.sendError(player, "health_must_be_full", true);
+                return true;
+            }
+
 
             if (player.getBedSpawnLocation() != null && player.getWorld() == player.getBedSpawnLocation().getWorld()) {
                 RespawnAnchor finalAnchor = anchor;

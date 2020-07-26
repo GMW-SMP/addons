@@ -71,8 +71,8 @@ public class PlayerManager {
      */
     public void addPlayers(Player... players) {
         gamePlayers.addAll(Arrays.stream(players)
+                .filter(p -> getGamePlayer(p) == null)
                 .map(this::loadFromFile)
-                .filter(gp -> !gamePlayers.contains(gp))
                 .collect(Collectors.toList())
         );
     }
@@ -108,6 +108,10 @@ public class PlayerManager {
      * @return The {@link GamePlayer} object of the given player.
      */
     private GamePlayer loadFromFile(Player player) {
+        GamePlayer potentialPlayer = getGamePlayer(player);
+        if (potentialPlayer != null)
+            return potentialPlayer;
+
         File dataFile = getDataFile(player.getUniqueId());
         if (dataFile == null || dataFile.length() < 4) {
             return new GamePlayer(player);
