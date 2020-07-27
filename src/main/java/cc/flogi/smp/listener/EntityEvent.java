@@ -36,7 +36,7 @@ public class EntityEvent implements Listener {
     }
 
     @EventHandler
-    public void onCreeperExplode(EntityExplodeEvent event) {
+    public void onEntityExplode(EntityExplodeEvent event) {
         if (event.getEntity() instanceof Creeper)
             event.setYield(1);
 
@@ -48,9 +48,12 @@ public class EntityEvent implements Listener {
             double y = rand.nextDouble();
             double z = (rand.nextDouble() - rand.nextDouble()) / 1.5;
 
+            //Invert explosion direction if needed.
+            if (event.getEntity().getVelocity().getY() > 0) y *= -1;
+
             FallingBlock fall = block.getWorld().spawnFallingBlock(block.getLocation(), block.getBlockData());
             fall.setDropItem(false);
-            fall.setHurtEntities(true);
+            fall.setHurtEntities(false);
             fall.setVelocity(new Vector(x, y, z));
             fall.setMetadata("debris", new FixedMetadataValue(SMP.get(), true));
         }
