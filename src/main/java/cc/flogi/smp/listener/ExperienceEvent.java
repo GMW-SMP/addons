@@ -4,6 +4,7 @@ import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.UtilEXP;
 import com.google.common.collect.ImmutableList;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -18,14 +19,18 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Caden Kriese
@@ -41,14 +46,6 @@ import java.util.*;
 
     @EventHandler
     public void onInventoryInteract(InventoryClickEvent event) {
-        if (event.getInventory() instanceof BrewerInventory) {
-            if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.GLASS_BOTTLE)
-                event.getCurrentItem().setItemMeta(null);
-
-            Arrays.stream(event.getInventory().getContents()).filter(Objects::nonNull).forEach(is -> is.setItemMeta(null));
-            return;
-        }
-
         if (event.getClickedInventory() == null
                 || !(event.getWhoClicked() instanceof Player)
                 || !(event.getClickedInventory() instanceof PlayerInventory))
@@ -124,9 +121,22 @@ import java.util.*;
 
     @EventHandler
     public void onPlayerConsumeItem(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack eventItem = event.getItem();
+
         if (event.getItem().getType() == Material.POTION) {
+            // Unrelated to experience but add mechanic for saturation from water.
+            if (event.getItem().getItemMeta() instanceof PotionMeta) {
+                PotionMeta meta = (PotionMeta) eventItem.getItemMeta();
+                if (meta.getBasePotionData().getType() == PotionType.WATER) {
+                    float saturationAddition = 3.5f;
+                    if ((player.getSaturation() + saturationAddition) > player.getFoodLevel()) saturationAddition = player.getFoodLevel() - player.getSaturation();
+                    player.setSaturation(player.getSaturation() + saturationAddition);
+                }
+            }
+
             ItemStack replacement = new ItemStack(Material.GLASS_BOTTLE);
-            applyXpLore(replacement, event.getPlayer());
+            applyXpLore(replacement, player);
             event.setReplacement(replacement);
         }
     }
