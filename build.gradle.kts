@@ -1,13 +1,19 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
+    id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 
 repositories {
     mavenCentral()
+    jcenter()
     maven {
+        // PaperMC
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
     maven {
+        // Dmulloy2 - ProtocolLib
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
     }
 }
@@ -25,4 +31,10 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
 }
 
-apply(plugin = "java")
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("smp")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+    }
+}
