@@ -4,7 +4,6 @@ import cc.flogi.smp.SMP;
 import cc.flogi.smp.i18n.I18n;
 import cc.flogi.smp.util.UtilEXP;
 import com.google.common.collect.ImmutableList;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -130,7 +129,8 @@ import java.util.List;
                 PotionMeta meta = (PotionMeta) eventItem.getItemMeta();
                 if (meta.getBasePotionData().getType() == PotionType.WATER) {
                     float saturationAddition = 3.5f;
-                    if ((player.getSaturation() + saturationAddition) > player.getFoodLevel()) saturationAddition = player.getFoodLevel() - player.getSaturation();
+                    if ((player.getSaturation() + saturationAddition) > player.getFoodLevel())
+                        saturationAddition = player.getFoodLevel() - player.getSaturation();
                     player.setSaturation(player.getSaturation() + saturationAddition);
                 }
             }
