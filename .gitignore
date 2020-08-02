@@ -9,10 +9,13 @@
 /out/
 # Mac
 .DS_Store
-# Maven
-log/
-target/
-dependency-reduced-pom.xml
+# Gradle
+.gradle
+**/build/
+!src/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+# Cache of project
 # I dont want it
 bin/
 src/test/
