@@ -1,9 +1,12 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "6.0.0"
 }
+
+group = "cc.flogi.smp"
+version = "2.2.1"
 
 repositories {
     mavenCentral()
@@ -32,7 +35,18 @@ dependencies {
 }
 
 tasks {
-    named<ShadowJar>("shadowJar") {
+    processResources {
+        // Not working right now, supposed to auto update version value in plugin.yml
+        val tokens = mapOf("version" to version)
+        inputs.properties(tokens)
+
+        from("src/main/resources") {
+            include("**/*.yml")
+            filter<ReplaceTokens>("tokens" to tokens)
+        }
+    }
+
+    shadowJar {
         archiveBaseName.set("smp")
         archiveClassifier.set("")
         archiveVersion.set("")
