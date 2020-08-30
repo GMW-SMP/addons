@@ -1,8 +1,8 @@
 name: SMP
-version: ${project.version}
-description: ${project.description}
+version: @version@
+description: Miscellaneous addons to the vanilla minecraft experience.
 main: cc.flogi.smp.SMP
-api-version: 1.13
+api-version: 1.16
 prefix: SMP
 depend: [ProtocolLib]
 authors: [flogic]
