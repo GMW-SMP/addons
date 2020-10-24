@@ -25,7 +25,7 @@ dependencies {
     implementation("commons-io:commons-io:2.6")
     implementation("org.apache.commons:commons-lang3:3.9")
     implementation("org.influxdb:influxdb-java:2.17")
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.3-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:18.0.0")
     compileOnly("org.projectlombok:lombok:1.18.12")
@@ -36,7 +36,6 @@ dependencies {
 
 tasks {
     processResources {
-        // Not working right now, supposed to auto update version value in plugin.yml
         val tokens = mapOf("version" to version)
         inputs.properties(tokens)
 
